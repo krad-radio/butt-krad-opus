@@ -1,0 +1,465 @@
+#!/bin/sh
+
+[ -z $CXX ] && CXX=g++
+[ -z $CXXFLAGS ] && CXXFLAGS=
+[ -z $LDFLAGS ] && LDFLAGS=
+
+LIBS="-lpthreadGC2"
+STATIC=0
+CHECK_FLTK=1
+CHECK_QT=0
+CHECK_LIBLAME=1
+CHECK_LIBVORBIS=1
+OGG=0
+MP3=0
+prefix=/usr/local
+
+header_flags=-I/usr/local/include
+lib_flags=-L/usr/local/lib
+pa_header=$header_flags
+pa_lib=$lib_flags
+vorbis_header=$header_flags
+vorbis_lib=$lib_flags
+lame_header=$header_flags
+lame_lib=$lib_flags
+
+##############################################################
+
+msg_chkfor() {
+    echo -n "checking for "$1" ... "
+}
+
+check_docs() {
+
+    msg_chkfor "asciidoc"
+    if which asciidoc 1> /dev/null 2>&3
+    then
+        echo "OK"
+        echo "#_______________________" >&4
+        echo "WITH_DOCS=1" >&4
+        echo "" >&4
+    else
+        echo "no. you cant rebuild the docs."
+    fi
+}
+
+check_tools() {
+
+    msg_chkfor "c++ compiler"
+    if which $CXX 1> /dev/null 2>&3
+    then
+        echo "OK"
+        echo "---------------------------------" 1>&3
+        $CXX -v 1>&3 2>&3
+        echo "---------------------------------" 1>&3
+    else
+        echo "FAILED"
+        echo "error, no compiler found"
+        exit 1
+    fi
+}
+
+check_portaudio() {
+    cat << EOF >tmp.c
+#include <portaudio.h>
+int main() {
+PaError p_err = Pa_Initialize();
+Pa_Terminate();
+return 0;
+}
+EOF
+    msg_chkfor "compile with PortAudio"
+    if ${CXX} $pa_header -c tmp.c -o tmp 2>&3
+    then
+        echo "OK"
+        msg_chkfor "link with PortAudio"
+        if ${CXX} $pa_header $pa_lib tmp.c -o tmp -lportaudio 2>&3
+        then
+            echo "OK"
+            echo "#_______________________" >&4
+                [ "$STATIC" -eq 0 ] && echo "LIBS+= -lportaudio" >&4
+                echo "" >&4
+                echo "CXXFLAGS+=$pa_header" >&4
+                echo "LDFLAGS+=$pa_lib" >&4
+            else
+                echo "FAILED"
+                echo "ABORT: butt requires PortAudio v19"
+                echo ""
+                exit 1
+            fi
+        else
+            echo "FAILED"
+            echo "ABORT: butt requires PortAudio v19"
+            echo ""
+            exit 1
+        fi
+
+}
+
+
+check_fltk() {
+
+
+cat << EOF >tmp.c
+#include <FL/Fl_Double_Window.H>
+
+int main() {
+Fl_Double_Window *win = new Fl_Double_Window(0,0);
+delete win;
+return 0;
+}
+EOF
+
+cat << EOF >tmp2.c
+#include <FL/Fl_Button.H>
+
+int main() {
+Fl_Button* btn = new Fl_Button(0, 0, 0, 0);
+btn->box(FL_GTK_UP_BOX);
+
+delete btn;
+return 0;
+}
+EOF
+
+msg_chkfor "fltk-config"
+if which fltk-config 1> /dev/null 2>&3
+then
+    echo "OK"
+    msg_chkfor "compile with fltk"
+    if ${CXX} -c tmp.c -o tmp `fltk-config --cxxflags` 2>&3
+    then
+        echo "OK"
+        msg_chkfor "fltk has FL_GTK_UP_BOX"
+        if ${CXX} -c tmp2.c -o tmp `fltk-config --cxxflags` 2>&3
+        then
+            echo "OK"
+            msg_chkfor "link with fltk"
+            if ${CXX} tmp.c -o tmp `fltk-config --cxxflags` `fltk-config --ldflags` 2>&3
+            then
+                echo "OK"
+                echo "#_______________________" >&4
+                echo "WITH_FLTK:=1" >&4
+                echo "CXXFLAGS_FLTK:=`fltk-config --cxxflags` -DFLTK1" >&4
+                echo "LIBS_FLTK:=`fltk-config --use-images --ldstaticflags`" >&4
+                echo "SRC_FLTK:=FLTK/fl_callbacks.cpp FLTK/fl_funcs.cpp FLTK/flgui.cpp FLTK/Fl_ILM216.cpp FLTK/Fl_Native_File_Chooser.cpp" >&4
+                echo "" >&4
+                GUI=FLTK
+            else
+                echo "FAILED"
+                echo "can't link against fltk. See config.log for more details"
+                rm config.mk
+                exit 1
+            fi
+        else
+            echo "FAILED"
+            echo "You need at least fltk version 1.1.8"
+            exit 1
+        fi
+    else
+        echo "FAILED"
+        echo "can'compile with fltk. See config.log for more details"
+        rm config.mk
+        exit 1
+    fi
+
+else
+    echo "FAILED"
+    echo "fltk-config was not found on your PC"
+    rm config.mk
+    exit 1
+fi
+
+}
+
+check_qt() {
+
+    echo "WITH_QT:=1" >&4
+    echo "SRC_QT:=QT/qt_funcs.cpp" >&4
+    GUI=QT
+
+}
+
+check_libmp3lame() {
+
+    cat << EOF >tmp.c
+#include <lame/lame.h>
+int main() {
+
+lame_global_flags *gfp;
+gfp = lame_init();
+lame_close(gfp);
+
+return 0;
+}
+EOF
+    msg_chkfor "compile with libmp3lame (lame)"
+    if ${CXX} $lame_header -c tmp.c -o tmp 2>&3
+    then
+        echo "OK"
+        msg_chkfor "link with libmp3lame (lame)"
+        if ${CXX} $lame_header $lame_lib tmp.c -o tmp -lmp3lame 2>&3
+        then
+            echo "OK"
+            echo "#_______________________" >&4
+                echo "WITH_LIBLAME:=1" >&4
+                echo "CXXFLAGS_LIBLAME:=" >&4
+                echo "CXXFLAGS+=$lame_header" >&4
+                echo "LDFLAGS+=$lame_lib" >&4
+                [ "$STATIC" -eq 0 ] && echo "LIBS_LIBLAME:=-lmp3lame" >&4
+                echo "SRC_LIBLAME:=lame_encode.cpp" >&4
+                echo "" >&4
+                MP3=1
+            else
+                echo "FAILED"
+                echo "WITH_LIBLAME:=0" >&4
+            fi
+        else
+            echo "FAILED"
+            echo "WITH_LIBLAME:=0" >&4
+        fi
+}
+check_libvorbis() {
+
+    cat << EOF >tmp.c
+#include <vorbis/vorbisenc.h>
+int main() {
+
+vorbis_info vi;
+vorbis_info_init(&vi);
+
+return 0;
+}
+EOF
+    msg_chkfor "compile with libvorbis"
+    if ${CXX} $vorbis_header -c tmp.c -o tmp 2>&3
+    then
+        echo "OK"
+        msg_chkfor "link with libvorbis"
+        if ${CXX} $vorbis_header $vorbis_lib tmp.c -o tmp -lvorbis -lvorbisenc 2>&3
+        then
+            echo "OK"
+            echo "#_______________________" >&4
+                echo "WITH_LIBVORBIS:=1" >&4
+                echo "CXXFLAGS_LIBVORBIS:=" >&4
+                echo "CXXFLAGS+=$vorbis_header" >&4
+                echo "LDFLAGS+=$vorbis_lib" >&4
+                [ "$STATIC" -eq 0 ] && echo "LIBS_LIBVORBIS:=-lvorbisenc -lvorbis -logg -lws2_32" >&4
+                echo "SRC_LIBVORBIS:=vorbis_encode.cpp" >&4
+                echo "" >&4
+                OGG=1
+            else
+                echo "FAILED"
+                echo "WITH_LIBVORBIS:=0" >&4
+            fi
+        else
+            echo "FAILED"
+            echo "WITH_LIBVORBIS:=0" >&4
+        fi
+}
+
+
+#############################################################################
+
+
+while [ $# -gt 0 ]
+do
+    case $1 in
+
+    --help)
+        cat <<EOF
+
+    Options for configure:
+
+    --prefix <prefix>       where to install
+    --debug                 enable debug symbols
+
+    --with(out)-mp3         build with mp3 support (default=yes)
+    --with(out)-ogg         build with ogg support (default=yes)
+
+    --pa-header <dir>       directory of portaudio v19 header
+    --pa-lib <dir>          directory of portaudio v19 library
+    --lame-header <dir>     directory of lame include folder
+    --lame-lib <dir>        directory of libmp3lame 
+    --vorbis-header <dir>   directory of vorbis include folder
+    --vorbis-lib <dir>      directory of vorbis library
+
+    --help                  shows usage of the configure script
+
+EOF
+            exit 0
+            ;;
+
+    --with-fltk) CHECK_FLTK=1;;
+    --with-qt) CHECK_QT=1 CHECK_FLTK=0;;
+    --with-ogg) CHECK_LIBVORBIS=1;;
+    --without-ogg) CHECK_LIBVORBIS=0;;
+    --with-mp3) CHECK_LIBLAME=1;;
+    --without-mp3) CHECK_LIBLAME=0;;
+    --static) STATIC=1;;
+
+    --prefix)
+        shift
+        if [ $# -gt 0 ]
+        then
+            prefix=$1
+        else
+            echo "error, missing argument for --prefix."
+            exit 1
+        fi
+        ;;
+
+    --pa-header)
+        shift
+        if [ $# -gt 0 ]
+        then
+            pa_header="-I$1"
+        else
+            echo "error, missing argument for --pa-header."
+            exit 1
+        fi
+        ;;
+
+    --pa-lib)
+        shift
+        if [ $# -gt 0 ]
+        then
+            pa_lib="-L$1"
+        else
+            echo "error, missing argument for --pa-lib."
+            exit 1
+        fi
+        ;;
+
+    --lame-header)
+        shift
+        if [ $# -gt 0 ]
+        then
+            lame_header="-I$1"
+        else
+            echo "error, missing argument for --lame-header."
+            exit 1
+        fi
+        ;;
+
+    --lame-lib)
+        shift
+        if [ $# -gt 0 ]
+        then
+            lame_lib="-L$1"
+        else
+            echo "error, missing argument for --lame-lib."
+            exit 1
+        fi
+        ;;
+
+    --vorbis-header)
+        shift
+        if [ $# -gt 0 ]
+        then
+            vorbis_header="-I$1"
+        else
+            echo "error, missing argument for --vorbis-header."
+            exit 1
+        fi
+        ;;
+
+    --vorbis-lib)
+        shift
+        if [ $# -gt 0 ]
+        then
+            vorbis_lib="-L$1"
+        else
+            echo "error, missing argument for --vorbis-lib."
+            exit 1
+        fi
+        ;;
+
+    --debug)
+        CXXFLAGS="${CXXFLAGS} -g"
+        LDFLAGS="${LDFLAGS} -g"
+        ;;
+
+        *)
+            echo "error, invalid argument: $1"
+            exit 1
+        ;;
+    esac
+    shift
+done
+
+
+##############################################################
+
+exec 3> config.log
+exec 4> config.mk
+
+echo "# butts's config.mk" >&4
+echo "#_______________________" >&4
+echo "DIST_VER=butt-0.1.12" >&4
+echo "VERSION=\\\"butt-0.1.12\\\"" >&4
+echo "prefix=$prefix" >&4
+echo "CXX=${CXX}" >&4
+echo "CXXFLAGS=${CXXFLAGS}" >&4
+echo "LDFLAGS=${LDFLAGS}" >&4
+echo "LIBS=${LIBS}" >&4
+echo "#_______________________" >&4
+echo "" >&4
+
+
+if [ "$CHECK_FLTK" -eq 1 ] && [ "$CHECK_QT" -eq 1 ]
+then
+    echo "you can't compile with FLTK and QT at the same time"
+    exit 1
+fi
+
+if [ "$CHECK_FLTK" -eq 0 ] && [ "$CHECK_QT" -eq 0 ]
+then
+    echo "you need to run configure with either --with-fltk or --with-qt"
+    exit 1
+fi
+
+echo ""
+#check_docs
+check_tools
+check_portaudio
+
+[ "$CHECK_FLTK" -eq 1 ] && check_fltk
+[ "$CHECK_QT" -eq 1 ] && check_qt
+[ "$CHECK_LIBVORBIS" -eq 1 ] && check_libvorbis
+[ "$CHECK_LIBLAME" -eq 1 ] && check_libmp3lame
+
+[ "$STATIC" -eq 1 ] && echo "LDFLAGS += -lasound -lpthread -L.. ../libstdc++.a /usr/local/lib/libshout.a /usr/lib/libvorbisenc.a /usr/lib/libvorbis.a /usr/lib/libogg.a /usr/lib/libmp3lame.a /usr/local/lib/libportaudio.a  /usr/lib/librt.a" >&4
+[ "$STATIC" -eq 0 ] && echo "LDFLAGS += -lmp3lame" >&4
+
+
+echo ""
+echo "configure summary"
+echo ""
+#echo "GUI:              $GUI"
+
+if [ "$OGG" -eq 1 ]
+then
+    echo "ogg support:      YES"
+else
+    echo "ogg support:      NO"
+fi
+
+if [ "$MP3" -eq 1 ]
+then
+    echo "mp3 support:      YES"
+else
+    echo "mp3 support:      NO"
+fi
+
+echo ""
+echo "You may run \"make\" now"
+echo "#_______________________" >&4
+echo ""
+echo "" >&4
+
+rm -f tmp*
+
+true
+
+# vim:ft=sh

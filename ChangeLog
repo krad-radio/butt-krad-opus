@@ -1,0 +1,138 @@
+Version 0.1.12 (2010-04-10)
+==========
+* butt is now able to connect automatically after startup
+* shortened time between connect attempts (fixes Shouted.FM connection problems)
+* improved wrong password detection for shoutcast	
+
+Version 0.1.11-2 (2008-12-14)
+==========
+* fixed display info after automatic reconnection
+
+Version 0.1.11-1 (2008-11-09)
+==========
+* fixed segfault if there is no '.' in the filename
+
+Version 0.1.11 (2008-10-26)
+==========
+* fixed unintended disconnects
+* fixed recording problems
+* removed buffer overrun messages
+* recording can be now stopped with the stop-button
+* replaced pcm recording by wav recording
+* recording as ogg is now possible 
+* added "stay on top" checkbox
+* fixed possible crash when changing mp3 settings while streaming
+
+Version 0.1.10 (2008-05-25)
+==========
+* removed xrun "led". Instead the msg window informs the user about overruns
+* added dB values to the vu-meter
+* fixed bitrate/samplerate selection for ogg
+* network backend works with non-blocking sockets now
+* libshout is not needed anymore
+* songname can be updated from a textfile now
+* more samplerates are supported now
+* fixed samplerate selection problems
+* fixed crash when connecting to icecast server on MacOS 10.4
+* fixed crash when changing the server type from shoutcast to icecast
+* some cosmetic changes (buttons, LEDs)
+
+Version 0.1.9 (2008-04-10)
+==========
+* minor GUI makeup
+* made butt more verbose
+* fixed possible segfault when trying to EDIT stream info
+* fixed automatic reconnection
+* filenames can be indexed with the %i variable now
+* renamed "rec not until connected" checkbox to "start rec. when connected"
+* added orange record icon for "armed" state ("start rec. when connected" = 1)
+* butt starts recording as soon as connected, when in "armed" state
+
+Version 0.1.8 (2008-03-30)
+==========
+
+* text/bg color can be changed in the [GUI] tab
+* removed the "Config saved" popup message
+* added pcm recording
+* improoved record handling
+* the config menu is more user friendly now
+* fixed crash when connection loss
+* the user may select the samplerate now
+* the config window can be attached to the main window now
+* fixed bitrate and codec ShoutCast info
+
+Version 0.1.7rc1 (2008-01-04)
+==========
+* butt runs on MacOS 10.4 and 10.5 now!
+* added recording time to the display info
+* fixed bug with '&' in the song string
+* changing the display mode works only when connected now
+* added a checkbox which lets the user decide if the recording should start
+right after selecting the output file or when connected
+* added a msg box which ask the user if he wants to stop the recording
+when disconnecting
+
+
+Version 0.1.6 (2007-12-08)
+==========
+* added status symbols to the display
+* recording runs with a seperate thread now!
+* added a button for showing/hiding the server password
+
+Version 0.1.5 (2007-11-22)
+==========
+* minor GUI changes
+* fixed streaming/recording with mp3 320kb/s
+* fixed segfault in Fl_ILM216.cpp
+* the user may change the display colors now (right click on the display)
+* the "connecting" info on the display updates faster now
+* changed default display colors to white/blue
+
+Version 0.1.5rc1 (2007-11-16)
+==========
+* replaced ALSA by PortAudio -> OSS is supported now
+* ported butt to Microsoft Windows (tested with win2k and win xp)
+* butt reminds the user about unsaved changes when closing now
+* starting the recording is possible at any time now
+* added mono encoding for OGG
+* improved some GUI stuff
+* improved CPU usage
+
+Version 0.1.4rc2 (2007-11-03)
+==========
+* butt should compile on more machines now
+
+Version 0.1.4rc1 (2007-11-01)
+==========
+* added IceCast support (ogg and mp3)
+* added ./configure script
+* butt is now able to send the "Current Song" value to the ShoutCast/IceCast server
+* Changed stereo mode from joint-stereo to real-stereo
+* code cleanup
+
+Version 0.1.3 (2007-10-08)
+==========
+* bugfix: butt crashed if you press "apply" in the server/icy tab without
+having an server/ICY-entry
+* bugfix: butt crashed if you change the bitrate without having an ICY-entry
+* bugfix: there was some uncommented code in the [DEL]-server callback-routine
+which shouldn't be uncommented 
+* facelift: if you delete all server/ICY-entries, the input fields in the server/ICY
+still showed the values of the last server/ICY-entry
+
+Version 0.1.2 (2007-10-07)
+==========
+* added a GUI for configuring butt
+* comments behind config entries are not allowed anymore.
+* removed the network init part. It was nonsense
+* fixed mono playblack
+* fixed recording problems
+* ICY entries can now be empty without causing butt to crash
+* butt shows the real port in its "connecting to..."-info line now and the "pseudeo" port in parenthesis
+* fixed a bug which causes pcm data loss in some cases
+
+Version 0.1.1 (2007-09-16)
+==========
+* added recording feature 
+* fixed seg fault on startup when compiled with gcc-4.1.2
+* fixed seg fault when encoding with high bitrates

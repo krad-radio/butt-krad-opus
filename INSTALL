@@ -1,0 +1,17 @@
+For the source package:
+=======================
+First you need to check if FLTK is already installed on your PC.
+You can do this by executing the command:
+fltk-config --version
+If the command is not found, FLTK is NOT installed on your PC.
+
+butt was tested with FLTK v1.1.x
+
+You can get it on http://www.fltk.org
+If you like eyecandy you should configure fltk with
+./configure --with-xft
+
+
+For the binary package:
+=======================
+Just run ./install.sh as root
