@@ -227,7 +227,7 @@ EOF
     then
         echo "OK"
         msg_chkfor "link with libvorbis"
-        if ${CXX} tmp.c -o /dev/null -lvorbisenc 2>&3
+        if ${CXX} tmp.c -o /dev/null -lvorbis -lvorbisenc 2>&3
         then
             echo "OK"
             echo "#_______________________" >&4
@@ -235,7 +235,7 @@ EOF
                 echo "CXXFLAGS_LIBVORBIS:=" >&4
                 echo "CXXFLAGS+=$vorbis_header" >&4
                 echo "LDFLAGS+=$vorbis_lib" >&4
-                [ "$STATIC" -eq 0 ] && echo "LIBS_LIBVORBIS:=-lvorbisenc" >&4
+                [ "$STATIC" -eq 0 ] && echo "LIBS_LIBVORBIS:=-logg -lvorbis -lvorbisenc" >&4
                 echo "SRC_LIBVORBIS:=vorbis_encode.cpp" >&4
                 echo "" >&4
                 OGG=1
