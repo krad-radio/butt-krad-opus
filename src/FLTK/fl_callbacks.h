@@ -42,6 +42,7 @@ void choice_cfg_samplerate_cb();
 void button_cfg_song_go_cb();
 void radio_cfg_codec_mp3_cb();
 void radio_cfg_codec_ogg_cb();
+void radio_cfg_codec_opus_cb();
 void button_add_icy_save_cb();
 void button_add_srv_cancel_cb();
 void button_add_icy_cancel_cb();

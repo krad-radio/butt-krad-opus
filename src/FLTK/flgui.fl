@@ -290,7 +290,12 @@ button_cfg->label("Settings@>");} open
             Fl_Round_Button radio_cfg_codec_ogg {
               label ogg
               callback {radio_cfg_codec_ogg_cb();}
-              xywh {139 174 65 24} type Radio down_box ROUND_DOWN_BOX
+              xywh {70 174 65 24} type Radio down_box ROUND_DOWN_BOX
+            }
+            Fl_Round_Button radio_cfg_codec_opus {
+              label opus
+              callback {radio_cfg_codec_opus_cb();}
+              xywh {140 174 65 24} type Radio down_box ROUND_DOWN_BOX
             }
           }
           Fl_Group {} {

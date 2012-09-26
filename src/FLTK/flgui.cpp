@@ -989,6 +989,14 @@ void flgui::cb_radio_cfg_codec_ogg(Fl_Round_Button* o, void* v) {
   ((flgui*)(o->parent()->parent()->parent()->parent()->user_data()))->cb_radio_cfg_codec_ogg_i(o,v);
 }
 
+void flgui::cb_radio_cfg_codec_opus_i(Fl_Round_Button*, void*) {
+  radio_cfg_codec_opus_cb();
+}
+
+void flgui::cb_radio_cfg_codec_opus(Fl_Round_Button* o, void* v) {
+  ((flgui*)(o->parent()->parent()->parent()->parent()->user_data()))->cb_radio_cfg_codec_opus_i(o,v);
+}
+
 void flgui::cb_radio_cfg_channel_stereo_i(Fl_Round_Button*, void*) {
   radio_cfg_channel_stereo_cb();
 }
@@ -1750,11 +1758,17 @@ flgui::flgui() {
             radio_cfg_codec_mp3->down_box(FL_ROUND_DOWN_BOX);
             radio_cfg_codec_mp3->callback((Fl_Callback*)cb_radio_cfg_codec_mp3);
           } // Fl_Round_Button* radio_cfg_codec_mp3
-          { radio_cfg_codec_ogg = new Fl_Round_Button(139, 174, 65, 24, "ogg");
+          { radio_cfg_codec_ogg = new Fl_Round_Button(85, 171, 65, 24, "ogg");
             radio_cfg_codec_ogg->type(102);
             radio_cfg_codec_ogg->down_box(FL_ROUND_DOWN_BOX);
             radio_cfg_codec_ogg->callback((Fl_Callback*)cb_radio_cfg_codec_ogg);
           } // Fl_Round_Button* radio_cfg_codec_ogg
+	  {
+		  radio_cfg_codec_opus = new Fl_Round_Button(145, 171, 65, 24, "opus");
+		  radio_cfg_codec_opus->type(102);
+		  radio_cfg_codec_opus->down_box(FL_ROUND_DOWN_BOX);
+		  radio_cfg_codec_opus->callback((Fl_Callback*) cb_radio_cfg_codec_opus);
+	  } // Fl_Round_Button* radio_cfg_codec_opus
           o->end();
         } // Fl_Group* o
         { Fl_Group* o = new Fl_Group(16, 119, 200, 25, "Channel:");
@@ -1765,7 +1779,7 @@ flgui::flgui() {
             radio_cfg_channel_stereo->down_box(FL_ROUND_DOWN_BOX);
             radio_cfg_channel_stereo->callback((Fl_Callback*)cb_radio_cfg_channel_stereo);
           } // Fl_Round_Button* radio_cfg_channel_stereo
-          { radio_cfg_channel_mono = new Fl_Round_Button(139, 124, 70, 15, "mono");
+          { radio_cfg_channel_mono = new Fl_Round_Button(145, 124, 70, 15, "mono");
             radio_cfg_channel_mono->type(102);
             radio_cfg_channel_mono->down_box(FL_ROUND_DOWN_BOX);
             radio_cfg_channel_mono->callback((Fl_Callback*)cb_radio_cfg_channel_mono);

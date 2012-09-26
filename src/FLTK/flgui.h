@@ -162,6 +162,11 @@ private:
   void cb_radio_cfg_codec_ogg_i(Fl_Round_Button*, void*);
   static void cb_radio_cfg_codec_ogg(Fl_Round_Button*, void*);
 public:
+  Fl_Round_Button *radio_cfg_codec_opus;
+private:
+  void cb_radio_cfg_codec_opus_i(Fl_Round_Button*, void*);
+  static void cb_radio_cfg_codec_opus(Fl_Round_Button*, void*);
+public:
   Fl_Round_Button *radio_cfg_channel_stereo;
 private:
   void cb_radio_cfg_channel_stereo_i(Fl_Round_Button*, void*);

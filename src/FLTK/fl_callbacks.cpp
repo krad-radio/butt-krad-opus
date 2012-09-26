@@ -1529,6 +1529,13 @@ void radio_cfg_codec_ogg_cb()
 #endif
 }
 
+void radio_cfg_codec_opus_cb()
+{
+#ifdef HAVE_LIBOPUS
+    print_info("Setup opus!", 0);
+#endif
+}
+
 void radio_rec_codec_mp3_cb()
 {
 #if HAVE_LIBLAME
