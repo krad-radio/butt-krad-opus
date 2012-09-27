@@ -10,6 +10,7 @@ CHECK_FLTK=1
 CHECK_QT=0
 CHECK_LIBLAME=1
 CHECK_LIBVORBIS=1
+CHECK_LIBOPUS=1
 OGG=0
 MP3=0
 prefix=/usr/local
@@ -248,6 +249,41 @@ EOF
             echo "WITH_LIBVORBIS:=0" >&4
         fi
 }
+check_libopus() {
+
+	cat << EOF >tmp.c
+#include <opus/opus.h>
+int main() {
+opus_get_version_string();
+return 0;
+}
+EOF
+	msg_chkfor "compile with libopus"
+	if ${CXX} -c tmp.c -o /dev/null 2>&3
+	then
+		echo "OK"
+		msg_chkfor "link with libopus"
+		if ${CXX} tmp.c -o /dev/null -lopus 2>&3
+		then
+			echo "OK"
+			echo "#_______________________" >&4
+				echo "WITH_LIBOPUS:=1" >&4
+				echo "CXXFLAGS_LIBOPUS:=" >&4
+				echo "CXXFLAGS+=$opus_header" >&4
+				echo "LDFLAGS+=$vorbis_lib" >&4
+				[ "$STATIC" -eq 0 ] && echo "LIBS_LIBOPUS:=-logg -lopus" >&4
+				echo "SRC_LIBOPUS:=opus_encode.cpp" >&4
+				echo "" >&4
+				OPUS=1
+			else
+				echo "FAILED"
+				echo "WITH_LIBOPUS:=0" >&4
+			fi
+		else
+			echo "FAILED"
+			echo "WITH_LIBOPUS:=0" >&4
+		fi
+}
 
 
 #############################################################################
@@ -267,11 +303,12 @@ do
 
     --with(out)-mp3         build with mp3 support (default=yes)
     --with(out)-ogg         build with ogg support (default=yes)
+    --with(out)-opus        build with opus support (default=yes)
 
     --pa-header <dir>       directory of portaudio v19 header
     --pa-lib <dir>          directory of portaudio v19 library
     --lame-header <dir>     directory of lame include folder
-    --lame-lib <dir>        directory of libmp3lame 
+    --lame-lib <dir>        directory of libmp3lame
     --vorbis-header <dir>   directory of vorbis include folder
     --vorbis-lib <dir>      directory of vorbis library
 
@@ -285,6 +322,8 @@ EOF
     --with-qt) CHECK_QT=1 CHECK_FLTK=0;;
     --with-ogg) CHECK_LIBVORBIS=1;;
     --without-ogg) CHECK_LIBVORBIS=0;;
+    --with-opus)  CHECK_LIBOPUS=1;;
+    --without-opus)  CHECK_LIBOPUS=0;;
     --with-mp3) CHECK_LIBLAME=1;;
     --without-mp3) CHECK_LIBLAME=0;;
     --static) STATIC=1;;
@@ -419,6 +458,7 @@ check_portaudio
 [ "$CHECK_QT" -eq 1 ] && check_qt
 [ "$CHECK_LIBVORBIS" -eq 1 ] && check_libvorbis
 [ "$CHECK_LIBLAME" -eq 1 ] && check_libmp3lame
+[ "$CHECK_LIBOPUS" -eq 1 ] && check_libopus
 
 [ "$STATIC" -eq 1 ] && echo "LDFLAGS += -lasound -lpthread -L.. ../libstdc++.a /usr/lib/libshout.a /usr/lib/libvorbisenc.a /usr/lib/libvorbis.a /usr/lib/libogg.a /usr/lib/libmp3lame.a /usr/lib/libportaudio.a /usr/lib/libjack.a /usr/lib/librt.a" >&4
 [ "$STATIC" -eq 0 ] && echo "LDFLAGS += -lmp3lame" >&4
@@ -441,6 +481,13 @@ then
     echo "mp3 support:      YES"
 else
     echo "mp3 support:      NO"
+fi
+
+if [ "$OPUS" -eq 1 ]
+then
+	echo "opus support:      YES"
+else
+	echo "opus support:      NO"
 fi
 
 echo ""
