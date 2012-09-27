@@ -270,7 +270,7 @@ EOF
 				echo "WITH_LIBOPUS:=1" >&4
 				echo "CXXFLAGS_LIBOPUS:=" >&4
 				echo "CXXFLAGS+=$opus_header" >&4
-				echo "LDFLAGS+=$vorbis_lib" >&4
+				echo "LDFLAGS+=$opus_lib" >&4
 				[ "$STATIC" -eq 0 ] && echo "LIBS_LIBOPUS:=-logg -lopus" >&4
 				echo "SRC_LIBOPUS:=opus_encode.cpp" >&4
 				echo "" >&4
@@ -401,6 +401,17 @@ EOF
             vorbis_lib="-L$1"
         else
             echo "error, missing argument for --vorbis-lib."
+            exit 1
+        fi
+        ;;
+
+    --opus-lib)
+        shift
+        if [ $# -gt 0 ]
+        then
+            opus_lib="-L$1"
+        else
+            echo "error, missing argument for --opus-lib."
             exit 1
         fi
         ;;
