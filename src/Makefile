@@ -35,7 +35,7 @@ SRC =	butt.cpp port_audio.cpp \
 
 ######################
 
-MODULES = FLTK QT PORTAUDIO LIBVORBIS LIBLAME
+MODULES = FLTK QT PORTAUDIO LIBVORBIS LIBLAME LIBOPUS
 $(foreach module,$(MODULES),$(eval $(call funcAddModule,$(module))))
 
 #######################
