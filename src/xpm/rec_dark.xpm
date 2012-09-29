@@ -1,5 +1,5 @@
 /* XPM */
-static char * rec_dark_xpm[] = {
+const char * rec_dark_xpm[] = {
 "16 16 40 1",
 " 	c None",
 ".	c #7C5B5B",

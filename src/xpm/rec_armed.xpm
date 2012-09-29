@@ -1,5 +1,5 @@
 /* XPM */
-static char * rec_armed_xpm[] = {
+const char * rec_armed_xpm[] = {
 "16 16 81 1",
 " 	c None",
 ".	c #C85916",

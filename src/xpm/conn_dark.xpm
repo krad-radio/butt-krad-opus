@@ -1,5 +1,5 @@
 /* XPM */
-static char * conn_dark_xpm[] = {
+const char * conn_dark_xpm[] = {
 "20 20 38 1",
 " 	c None",
 ".	c #7B7C63",

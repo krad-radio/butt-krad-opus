@@ -1,5 +1,5 @@
 /* XPM */
-static char * conn_xpm[] = {
+const char * conn_xpm[] = {
 "20 20 62 1",
 " 	c None",
 ".	c #E6F632",
