@@ -56,6 +56,7 @@ lame_enc lame_stream;
 lame_enc lame_rec;
 vorbis_enc vorbis_stream;
 vorbis_enc vorbis_rec;
+opus_enc opus_stream;
 
 int main()
 {
@@ -144,6 +145,14 @@ int main()
     vorbis_rec.bitrate = cfg.rec.bitrate;
     vorbis_rec.samplerate = cfg.rec.samplerate;
     vorbis_enc_init(&vorbis_rec);
+#endif
+#ifdef HAVE_LIBOPUS
+    opus_stream.channel = cfg.audio.channel;
+    opus_stream.bitrate = cfg.audio.bitrate;
+    opus_stream.samplerate = cfg.audio.samplerate;
+    opus_enc_init(&opus_stream);
+
+    // add recording later
 #endif
 
     print_info("=========================\n", 0);

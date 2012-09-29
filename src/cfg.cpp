@@ -249,6 +249,8 @@ int cfg_set_values()
         strcpy(cfg.audio.codec, "mp3");
 #elif HAVE_LIBVORBIS
         strcpy(cfg.audio.codec, "ogg");
+#elif HAVE_LIBOPUS
+	strcpy(cfg.audio.codec, "opus");
 #else
         //error: but was compiled without ogg and mp3 support
         strcpy(cfg.audio.codec, "err");
@@ -284,7 +286,7 @@ int cfg_set_values()
         cfg.rec.codec = (char*)malloc(4*sizeof(char));
 #ifdef HAVE_LIBLAME
         strcpy(cfg.rec.codec, "mp3");
-#elif HAVE_LIB_VORBIS
+#elif HAVE_LIBVORBIS
         strcpy(cfg.rec.codec, "ogg");
 #else
         strcpy(cfg.rec.codec, "wav");

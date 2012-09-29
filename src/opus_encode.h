@@ -16,8 +16,8 @@
 #ifndef OPUS_ENCODE_H
 #define OPUS_ENCODE_H
 
-#include <opus.h>
-#include <opus_multistream.h>
+#include <opus/opus.h>
+#include <opus/opus_multistream.h>
 #include <ogg/ogg.h>
 
 
@@ -25,7 +25,7 @@ struct opus_enc {
     ogg_stream_state os; /* take physical pages, weld into a logical stream of packets */
     ogg_page         og; /* one Ogg bitstream page.  opus packets are inside */
     ogg_packet       op; /* one raw packet of data for decode */
-    OpusMSEncoder	*encoder;
+    OpusMSEncoder    *encoder;
 
     int bitrate;
     int samplerate;
@@ -38,7 +38,8 @@ enum {
     OPUS_BUSY = 1
 };
 
-extern opus_info  opus_vi;
+//extern opus_info  opus_vi;
+extern OpusEncoder opus_vi;
 extern char* opus_buf;
 
 int opus_enc_init(opus_enc *opus);

@@ -19,6 +19,7 @@
 #include "timer.h"
 #include "lame_encode.h"
 #include "vorbis_encode.h"
+#include "opus_encode.h"
 
 extern bool record;
 extern bool recording;      //TRUE if butt is recording
@@ -40,6 +41,6 @@ extern lame_enc lame_stream;
 extern lame_enc lame_rec;
 extern vorbis_enc vorbis_stream;
 extern vorbis_enc vorbis_rec;
-
+extern opus_enc opus_stream;
 
 #endif
