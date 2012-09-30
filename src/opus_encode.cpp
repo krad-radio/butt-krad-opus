@@ -207,6 +207,8 @@ void opus_enc_write_header(opus_enc *opus)
 
 	ogg_packet op;
 
+	ogg_stream_clear (&opus->os);
+	ogg_stream_init(&opus->os, rand());	
 	opus_encoder_ctl (opus->encoder, OPUS_RESET_STATE);
 
 	opus->packetno = 0;
@@ -292,14 +294,16 @@ int opus_enc_encode(opus_enc *opus, short *pcm_buf, char *enc_buf, int size)
 void opus_enc_close(opus_enc *opus)
 {
 
-    ogg_stream_destroy (&opus->os);
-    opus_encoder_destroy (opus->encoder);
+	if (opus->buffer != NULL) {
+		ogg_stream_clear (&opus->os);
+		opus_encoder_destroy (opus->encoder);
 
-	free (opus->header_data);
-	free (opus->header);
-	free (opus->tags);
-	free (opus->buffer);
-
+		free (opus->header_data);
+		free (opus->header);
+		free (opus->tags);
+		free (opus->buffer);
+		opus->buffer = NULL;
+	}
 	//printf("Opus Encoder Destroyed\n");
 
 }

@@ -200,8 +200,7 @@ void snd_stop_stream()
     pthread_mutex_destroy(&stream_mut);
     pthread_cond_destroy(&stream_cond);
 
-
-    print_info("user disconnected\n", 0);
+    print_info("Disconnected\n", 0);
 }
 
 void *snd_stream_thread(void *data)
@@ -268,7 +267,7 @@ void snd_start_rec()
 
     bytes_written = 0;
     recording = 1;
-
+	opus_enc_reinit(&opus_rec);
     pthread_create(&rec_thread, NULL, snd_rec_thread, NULL);
 
     print_info("recording to:", 0);
