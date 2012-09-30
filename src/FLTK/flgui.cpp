@@ -1436,9 +1436,9 @@ void flgui::cb_button_add_icy_save(Fl_Button* o, void* v) {
 }
 
 flgui::flgui() {
-  { window_main = new Fl_My_Double_Window(430, 340);
+  { window_main = new Fl_My_Double_Window(430, 320);
     window_main->box(FL_FLAT_BOX);
-    window_main->color(FL_BACKGROUND_COLOR);
+    window_main->color(fl_rgb_color(77, 77, 77));
     window_main->selection_color(FL_BACKGROUND_COLOR);
     window_main->labeltype(FL_NO_LABEL);
     window_main->labelfont(0);
@@ -1450,8 +1450,8 @@ flgui::flgui() {
     { Fl_Group* o = new Fl_Group(0, -1, 432, 164);
       { lcd = new Fl_ILM216(10, 9, 410, 95);
         lcd->tooltip("press left mouse to toggle lcd info");
-        lcd->box(FL_ENGRAVED_BOX);
-        lcd->color(FL_SELECTION_COLOR);
+        lcd->box(FL_THIN_UP_BOX);
+        lcd->color(fl_rgb_color(166, 111, 111));
         lcd->selection_color((Fl_Color)41);
         lcd->labeltype(FL_NORMAL_LABEL);
         lcd->labelfont(0);
@@ -1461,37 +1461,37 @@ flgui::flgui() {
         lcd->align(FL_ALIGN_CENTER);
         lcd->when(FL_WHEN_RELEASE);
       } // Fl_ILM216* lcd
-      { button_connect = new Fl_Button(90, 121, 30, 30, "@> ");
-        button_connect->tooltip("connect");
-        button_connect->box(FL_ENGRAVED_BOX);
-        button_connect->down_box(FL_ENGRAVED_BOX);
+      { button_connect = new Fl_Button(100, 118, 42, 35, "@+18-> ");
+        button_connect->tooltip("Transmit");
+        button_connect->box(FL_FLAT_BOX);
+        button_connect->down_box(FL_FLAT_BOX);
         button_connect->shortcut(0x40063);
-        button_connect->color((Fl_Color)48);
-        button_connect->selection_color((Fl_Color)40);
-        button_connect->labelfont(1);
-        button_connect->labelcolor(FL_BACKGROUND2_COLOR);
+        button_connect->color(fl_rgb_color(111, 111, 111));
+        button_connect->selection_color(fl_rgb_color(111, 255, 111));
+        button_connect->labelfont(7);
+        button_connect->labelcolor(fl_rgb_color(11, 240, 11));
         button_connect->callback((Fl_Callback*)cb_button_connect);
       } // Fl_Button* button_connect
-      { button_disconnect = new Fl_Button(50, 121, 30, 30, "@-3square");
-        button_disconnect->tooltip("disconnect");
-        button_disconnect->box(FL_ENGRAVED_BOX);
-        button_disconnect->down_box(FL_ENGRAVED_BOX);
+      { button_disconnect = new Fl_Button(55, 118, 42, 35, "@-2square");
+        button_disconnect->tooltip("Stop");
+        button_disconnect->box(FL_FLAT_BOX);
+        button_disconnect->down_box(FL_FLAT_BOX);
         button_disconnect->shortcut(0x40064);
-        button_disconnect->color((Fl_Color)48);
-        button_disconnect->selection_color((Fl_Color)40);
+        button_disconnect->color(fl_rgb_color(111, 111, 111));
+        button_disconnect->selection_color(fl_rgb_color(11, 11, 11));
         button_disconnect->labelfont(1);
-        button_disconnect->labelcolor(FL_BACKGROUND2_COLOR);
+        button_disconnect->labelcolor((Fl_Color)3);
         button_disconnect->callback((Fl_Callback*)cb_button_disconnect);
       } // Fl_Button* button_disconnect
-      { button_record = new Fl_Button(10, 121, 30, 30, "@-3circle");
-        button_record->tooltip("start/stop recording");
-        button_record->box(FL_ENGRAVED_BOX);
-        button_record->down_box(FL_ENGRAVED_BOX);
+      { button_record = new Fl_Button(10, 118, 42, 35, "@circle");
+        button_record->tooltip("Record");
+        button_record->box(FL_FLAT_BOX);
+        button_record->down_box(FL_FLAT_BOX);
         button_record->shortcut(0x40072);
-        button_record->color((Fl_Color)48);
-        button_record->selection_color((Fl_Color)40);
+        button_record->color(fl_rgb_color(111, 111, 111));
+        button_record->selection_color((Fl_Color)1);
         button_record->labelfont(1);
-        button_record->labelcolor((Fl_Color)1);
+        button_record->labelcolor(fl_rgb_color(240, 11, 11));
         button_record->callback((Fl_Callback*)cb_button_record);
       } // Fl_Button* button_record
       { Fl_Group* o = new Fl_Group(300, 109, 120, 45);
@@ -1506,12 +1506,12 @@ flgui::flgui() {
         } // Fl_Light_Button* button_backlight
         o->end();
       } // Fl_Group* o
-      { button_info = new Fl_Button(352, 143, 68, 15, "Info @2<");
+      { button_info = new Fl_Button(332, 139, 76, 18, "Info @<");
         button_info->tooltip("show/hide info window");
-        button_info->box(FL_ENGRAVED_BOX);
+        button_info->box(FL_FLAT_BOX);
         button_info->shortcut(0x40076);
-        button_info->color((Fl_Color)48);
-        button_info->labelsize(10);
+        button_info->color(fl_rgb_color(111, 111, 111));
+        button_info->labelsize(11);
         button_info->callback((Fl_Callback*)cb_button_info);
       } // Fl_Button* button_info
       { LEDs_dark = new Fl_Group(157, 115, 149, 39);
@@ -1655,17 +1655,17 @@ flgui::flgui() {
       o->end();
     } // Fl_Group* o
     { info_output = new Fl_Text_Display(0, 165, 430, 175);
-      info_output->box(FL_EMBOSSED_BOX);
+      info_output->box(FL_FLAT_BOX);
       info_output->textfont(4);
       info_output->textsize(15);
       Fl_Group::current()->resizable(info_output);
     } // Fl_Text_Display* info_output
-    { button_cfg = new Fl_Button(352, 114, 68, 22, "Settings@>");
+    { button_cfg = new Fl_Button(332, 118, 76, 18, "Settings@>");
       button_cfg->tooltip("show/hide config window");
-      button_cfg->box(FL_ENGRAVED_BOX);
+      button_cfg->box(FL_FLAT_BOX);
       button_cfg->shortcut(0x40066);
-      button_cfg->color((Fl_Color)48);
-      button_cfg->labelfont(1);
+      button_cfg->color(fl_rgb_color(111, 111, 111));
+      button_cfg->labelfont(0);
       button_cfg->labelsize(11);
       button_cfg->callback((Fl_Callback*)cb_button_cfg);
     } // Fl_Button* button_cfg
@@ -2048,7 +2048,7 @@ window_main->label("Opus Transmitter");
 
 info_buffer = new Fl_Text_Buffer();
 info_output->buffer(info_buffer);
-
+info_output->color(fl_rgb_color(233, 233, 233) );
 //info_output_->wrap_mode(1, 44); //wrap text after 44chars
 
 // show info output...
