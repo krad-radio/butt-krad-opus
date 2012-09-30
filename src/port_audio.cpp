@@ -295,32 +295,39 @@ void* snd_rec_thread(void *data)
 {
     int rb_read_bytes;
     int ogg_header_written;
-    int enc_bytes_read;
     char *enc_buf = (char*)malloc(rec_rb.size * sizeof(char)*10);
     char *audio_buf = (char*)malloc(rec_rb.size * sizeof(short));
+	int encode_bytes_read;
+	int bytes_to_read;
 
+    encode_bytes_read = 0;
     ogg_header_written = 0;
+
+	bytes_to_read = 960 * 2*cfg.audio.channel;
 
     while(record)
     {
         pthread_cond_wait(&rec_cond, &rec_mut);
-
-		rb_read_bytes = rb_read(&rec_rb, audio_buf);
-		if(rb_read_bytes == 0)
-			continue;
-
-        if (!strcmp(cfg.rec.codec, "opus"))
+        
+        
+        if(!ogg_header_written)
         {
-            if(!ogg_header_written)
-            {
-                opus_enc_write_header(&opus_rec);
-                ogg_header_written = 1;
-            }
-
-            enc_bytes_read = opus_enc_encode(&opus_rec, (short int*)audio_buf, 
-                    enc_buf, rb_read_bytes/(2*cfg.rec.channel));
-            bytes_written += fwrite(enc_buf, 1, enc_bytes_read, cfg.rec.fd);
+            opus_enc_write_header(&opus_rec);
+            ogg_header_written = 1;
         }
+        
+		while ((rb_filled(&rec_rb)) >= bytes_to_read) {
+
+	
+			rb_read_len(&rec_rb, audio_buf, bytes_to_read);
+
+		    encode_bytes_read = opus_enc_encode(&opus_rec, (short int*)audio_buf, 
+		                enc_buf, bytes_to_read/(2*cfg.audio.channel));
+
+		  bytes_written += fwrite(enc_buf, 1, encode_bytes_read, cfg.rec.fd);
+		        
+		        
+		}
 
     }
 
