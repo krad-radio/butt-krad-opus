@@ -22,9 +22,9 @@
 #include "config.h"
 
 #ifdef _WIN32
- const char CONFIG_FILE[] = "opusass";
+ const char CONFIG_FILE[] = "opustransmitter";
 #else
- const char CONFIG_FILE[] = ".opusass";
+ const char CONFIG_FILE[] = ".opustransmitter";
 #endif
 
 config_t cfg;
@@ -394,11 +394,11 @@ int cfg_set_values()
 #if HAVE_FLTK
     cfg.main.bg_color = cfg_get_int("main", "bg_color");
     if(cfg.main.bg_color == -1)
-        cfg.main.bg_color = 151540480; //dark blue
+        cfg.main.bg_color = 426056448;
 
     cfg.main.txt_color = cfg_get_int("main", "txt_color");
     if(cfg.main.txt_color == -1)
-        cfg.main.txt_color = -256; //white
+        cfg.main.txt_color = 67043328; //white
 #endif
 
     return 0;

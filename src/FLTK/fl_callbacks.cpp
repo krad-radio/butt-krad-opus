@@ -1007,7 +1007,7 @@ void choice_cfg_bitrate_cb()
     sel_br = fl_g->choice_cfg_bitrate->value();
     cfg.audio.bitrate = br_list[sel_br];
     lame_stream.bitrate = br_list[sel_br];
-    opus_stream.bitrate = br_list[sel_br];
+    opus_stream.bitrate = br_list[sel_br] * 1000;
 
 
     if(fl_g->radio_cfg_codec_ogg->value())
@@ -1050,7 +1050,7 @@ void choice_rec_bitrate_cb()
     sel_br = fl_g->choice_rec_bitrate->value();
     cfg.rec.bitrate = br_list[sel_br];
     lame_rec.bitrate = br_list[sel_br];
-    opus_rec.bitrate = br_list[sel_br];
+    opus_rec.bitrate = br_list[sel_br] * 1000;
 
 
 

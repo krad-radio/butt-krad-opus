@@ -50,6 +50,7 @@ struct opus_enc {
 	int packetno;
 	int granulepos;
 	
+	int last_bitrate;
     int bitrate;
     int samplerate;
     int channel;

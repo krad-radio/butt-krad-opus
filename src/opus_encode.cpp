@@ -165,14 +165,20 @@ int opus_enc_init(opus_enc *opus)
     srand(time(NULL));
     ogg_stream_init(&opus->os, rand());
 	opus->header->gain = 0;
-	opus->header->channels = 2;	
+	opus->header->channels = 2;
+	
+	if ((opus->bitrate < 9600) || (opus->bitrate > 320000)) {
+		opus->bitrate = DEFAULT_OPUS_BITRATE;
+	}
+	
 	opus->header->input_sample_rate = 48000;
 	opus->encoder = opus_encoder_create (48000, 2, OPUS_APPLICATION_AUDIO, &err);
-	opus_encoder_ctl (opus->encoder, OPUS_SET_BITRATE(DEFAULT_OPUS_BITRATE));
+	opus_encoder_ctl (opus->encoder, OPUS_SET_BITRATE(opus->bitrate));
 	if (opus->encoder == NULL) {
 		printf("Opus Encoder creation error: %s\n", opus_strerror (err));
 		return 1;
 	}
+	opus->last_bitrate = opus->bitrate;
 	opus_encoder_ctl (opus->encoder, OPUS_GET_LOOKAHEAD (&opus->header->preskip));
 	opus->header_size = opus_header_to_packet (opus->header, opus->header_data, 100);
 
@@ -265,6 +271,15 @@ int opus_enc_encode(opus_enc *opus, short *pcm_buf, char *enc_buf, int size)
         memcpy(enc_buf+w, opus->og.body, opus->og.body_len);
         w += opus->og.body_len;
 	}
+	
+	if (opus->last_bitrate != opus->bitrate) {
+		if ((opus->bitrate < 9600) || (opus->bitrate > 320000)) {
+			opus->bitrate = DEFAULT_OPUS_BITRATE;
+		}	
+		opus_encoder_ctl (opus->encoder, OPUS_SET_BITRATE(opus->bitrate));
+		opus->last_bitrate = opus->bitrate;
+	}
+	
 
 	ret = opus_encode (opus->encoder, pcm_buf, 960, opus->buffer, 2048 * 4);
 	

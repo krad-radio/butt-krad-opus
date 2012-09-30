@@ -124,14 +124,14 @@ int main()
     }
 
 
-    opus_stream.channel = cfg.audio.channel;
-    opus_stream.bitrate = cfg.audio.bitrate;
-    opus_stream.samplerate = cfg.audio.samplerate;
+    opus_stream.channel = 2;
+    opus_stream.bitrate = cfg.audio.bitrate * 1000;
+    opus_stream.samplerate = 48000;
     opus_enc_init(&opus_stream);
 
-    opus_rec.channel = cfg.audio.channel;
-    opus_rec.bitrate = cfg.audio.bitrate;
-    opus_rec.samplerate = cfg.audio.samplerate;
+    opus_rec.channel = 2;
+    opus_rec.bitrate = cfg.rec.bitrate * 1000;
+    opus_rec.samplerate = 48000;
     opus_enc_init(&opus_rec);
 
 

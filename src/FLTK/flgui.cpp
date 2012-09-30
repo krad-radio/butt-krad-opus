@@ -1783,6 +1783,7 @@ flgui::flgui() {
             radio_cfg_channel_mono->type(102);
             radio_cfg_channel_mono->down_box(FL_ROUND_DOWN_BOX);
             radio_cfg_channel_mono->callback((Fl_Callback*)cb_radio_cfg_channel_mono);
+             radio_cfg_channel_mono->deactivate();
           } // Fl_Round_Button* radio_cfg_channel_mono
           o->end();
         } // Fl_Group* o
@@ -1790,6 +1791,7 @@ flgui::flgui() {
           choice_cfg_samplerate->down_box(FL_BORDER_BOX);
           choice_cfg_samplerate->callback((Fl_Callback*)cb_choice_cfg_samplerate);
           choice_cfg_samplerate->align(FL_ALIGN_TOP_LEFT);
+                     choice_cfg_samplerate->deactivate();     
         } // Fl_Choice* choice_cfg_samplerate
         { choice_cfg_bitrate = new Fl_Choice(16, 65, 72, 20, "Bitrate:");
           choice_cfg_bitrate->box(FL_ENGRAVED_BOX);
@@ -1855,6 +1857,7 @@ flgui::flgui() {
           choice_rec_samplerate->down_box(FL_BORDER_BOX);
           choice_rec_samplerate->callback((Fl_Callback*)cb_choice_rec_samplerate);
           choice_rec_samplerate->align(FL_ALIGN_TOP_LEFT);
+                choice_rec_samplerate->deactivate();
         } // Fl_Choice* choice_rec_samplerate
         { Fl_Group* o = new Fl_Group(15, 246, 200, 25, "Channel:");
           o->box(FL_PLASTIC_UP_FRAME);
@@ -1868,6 +1871,7 @@ flgui::flgui() {
             radio_rec_channel_mono->type(102);
             radio_rec_channel_mono->down_box(FL_ROUND_DOWN_BOX);
             radio_rec_channel_mono->callback((Fl_Callback*)cb_radio_rec_channel_mono);
+                  radio_rec_channel_mono->deactivate();
           } // Fl_Round_Button* radio_rec_channel_mono
           o->end();
         } // Fl_Group* o
@@ -1885,7 +1889,7 @@ flgui::flgui() {
             radio_rec_codec_ogg->down_box(FL_ROUND_DOWN_BOX);
             radio_rec_codec_ogg->callback((Fl_Callback*)cb_radio_rec_codec_ogg);
           } // Fl_Round_Button* radio_rec_codec_ogg
-          { radio_rec_codec_wav = new Fl_Round_Button(138, 305, 60, 20, "wav");
+          { radio_rec_codec_wav = new Fl_Round_Button(138, 305, 60, 20, "opus");
             radio_rec_codec_wav->type(102);
             radio_rec_codec_wav->down_box(FL_ROUND_DOWN_BOX);
             radio_rec_codec_wav->callback((Fl_Callback*)cb_radio_rec_codec_wav);
@@ -1971,8 +1975,10 @@ flgui::flgui() {
         radio_add_srv_icecast->down_box(FL_ROUND_DOWN_BOX);
         radio_add_srv_icecast->callback((Fl_Callback*)cb_radio_add_srv_icecast);
       } // Fl_Round_Button* radio_add_srv_icecast
-      radio_add_srv_shoutcast->value(1);
-      input_add_srv_mount->deactivate();
+      //radio_add_srv_shoutcast->value(1);
+      radio_add_srv_icecast->value(1);
+      radio_add_srv_shoutcast->deactivate();      
+      //input_add_srv_mount->deactivate();
       o->end();
     } // Fl_Group* o
     { Fl_Button* o = new Fl_Button(10, 302, 74, 25, "&Cancel");

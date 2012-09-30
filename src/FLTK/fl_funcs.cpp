@@ -121,7 +121,7 @@ void fill_cfg_widgets()
     else //wav
     {
         fl_g->radio_rec_codec_wav->setonly();
-        fl_g->choice_rec_bitrate->deactivate();
+        //fl_g->choice_rec_bitrate->deactivate();
     }
 
     if(cfg.rec.channel == 1)
