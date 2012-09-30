@@ -234,8 +234,8 @@ void opus_enc_write_header(opus_enc *opus)
 	op.e_o_s = 0;
 	op.granulepos = 0;
 	op.packetno = opus->packetno++;
-	op.packet = opus->header_data;
-	op.bytes = opus->header_size;
+	op.packet = opus->tags;
+	op.bytes = opus->tags_size;
 
 	ogg_stream_packetin (&opus->os, &op);
 	
