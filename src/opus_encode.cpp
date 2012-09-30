@@ -158,20 +158,22 @@ int opus_enc_init(opus_enc *opus)
     int err;
 
 	err = 0;
-
 	opus->header = (OpusHeader *)calloc(1, sizeof(OpusHeader));
 	opus->header_data = (unsigned char *)calloc (1, 1024);	
 	opus->tags = (unsigned char *)calloc (1, 1024);
 	opus->buffer = (unsigned char *)calloc (1, 4 * 4096);
-
     srand(time(NULL));
     ogg_stream_init(&opus->os, rand());
-
-	//opus_multistream_encoder_ctl (opus->encoder, OPUS_GET_LOOKAHEAD (&opus->lookahead));
-	opus->header->preskip = 0;
 	opus->header->gain = 0;
 	opus->header->channels = 2;	
 	opus->header->input_sample_rate = 48000;
+	opus->encoder = opus_encoder_create (48000, 2, OPUS_APPLICATION_AUDIO, &err);
+	opus_encoder_ctl (opus->encoder, OPUS_SET_BITRATE(DEFAULT_OPUS_BITRATE));
+	if (opus->encoder == NULL) {
+		printf("Opus Encoder creation error: %s\n", opus_strerror (err));
+		return 1;
+	}
+	opus_encoder_ctl (opus->encoder, OPUS_GET_LOOKAHEAD (&opus->header->preskip));
 	opus->header_size = opus_header_to_packet (opus->header, opus->header_data, 100);
 
 	opus->tags_size = 
@@ -192,17 +194,6 @@ int opus_enc_init(opus_enc *opus)
 	memcpy (opus->tags + 12 + strlen (opus_get_version_string ()) + 4 + 4 + strlen ("ENCODER="),
 			APPVERSION,
 			strlen (APPVERSION));	
-
-	opus->encoder = opus_encoder_create (48000, 2, OPUS_APPLICATION_AUDIO, &err);
-	opus_encoder_ctl (opus->encoder, OPUS_SET_BITRATE(DEFAULT_OPUS_BITRATE));
-
-
-	if (opus->encoder == NULL) {
-		
-		printf("Opus Encoder creation error: %s\n", opus_strerror (err));
-
-		return 1;
-	}
 
 	//printf("Opus Encoder Created\n");
 

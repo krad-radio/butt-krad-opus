@@ -20,7 +20,7 @@
 #include <opus/opus_multistream.h>
 #include <ogg/ogg.h>
 
-#define APPVERSION "Krackhead"
+#define APPVERSION "OpusTransmiter Special Edition"
 #define DEFAULT_OPUS_BITRATE 128000
 
 typedef struct {
