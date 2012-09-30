@@ -72,7 +72,7 @@ int snd_init()
 				"Sound init failed:\n%s\n",
 				Pa_GetErrorText(p_err));
 
-        ALERT(info_buf);
+      //  ALERT(info_buf);
         return 1;
     }
 

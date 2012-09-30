@@ -316,7 +316,7 @@ int cfg_set_values()
         for(i = 0; srv_ent != NULL; i++)
         {
             cfg.srv[i]->name = (char*)malloc((MAX_SECTION_LENGTH+1) * sizeof(char));
-            snprintf(cfg.srv[i]->name, MAX_SECTION_LENGTH, srv_ent);
+            snprintf(cfg.srv[i]->name, MAX_SECTION_LENGTH, srv_ent, "");
 
             cfg.srv[i]->addr  = cfg_get_str(srv_ent, "address");
             cfg.srv[i]->port  = cfg_get_int(srv_ent, "port");
@@ -353,7 +353,7 @@ int cfg_set_values()
         for(i = 0; icy_ent != NULL; i++)
         {
             cfg.icy[i]->name = (char*)malloc(MAX_SECTION_LENGTH * sizeof(char)+1);
-            snprintf(cfg.icy[i]->name, MAX_SECTION_LENGTH, icy_ent);
+            snprintf(cfg.icy[i]->name, MAX_SECTION_LENGTH, icy_ent, "");
 
             cfg.icy[i]->desc  = cfg_get_str(icy_ent, "description");
             cfg.icy[i]->genre = cfg_get_str(icy_ent, "genre");

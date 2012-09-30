@@ -94,7 +94,7 @@ int ic_connect()
     sock_send(&stream_socket, send_buf, strlen(send_buf), SEND_TIMEOUT);
 
     snprintf(auth, sizeof(auth), "%s:%s", user, cfg.srv[cfg.selected_srv]->pwd);
-    snprintf(b64_auth, sizeof(b64_auth), util_base64_enc(auth));
+    snprintf(b64_auth, sizeof(b64_auth), util_base64_enc(auth), "");
     snprintf(send_buf, sizeof(send_buf), "Authorization: Basic %s\r\n", b64_auth);
     sock_send(&stream_socket, send_buf, strlen(send_buf), SEND_TIMEOUT);
 
