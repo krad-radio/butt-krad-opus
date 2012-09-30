@@ -57,6 +57,7 @@ lame_enc lame_rec;
 vorbis_enc vorbis_stream;
 vorbis_enc vorbis_rec;
 opus_enc opus_stream;
+opus_enc opus_rec;
 
 int main()
 {
@@ -73,7 +74,7 @@ int main()
     SHOW_GUI();
 
     snprintf(info_buf, sizeof(info_buf),
-            "starting %s\nwritten by Daniel Noethen\n", VERSION);
+            "starting %s\n", VERSION);
     print_info(info_buf, 0);
 
 #ifdef _WIN32
@@ -101,10 +102,10 @@ int main()
 #endif
 
     if(!snd_init())
-        print_info("PortAudio init succeeded", 0);
+        print_info("Sound init succeeded", 0);
     else
     {
-        ALERT("PortAudio init failed");
+        ALERT("Sound init failed");
         return 1;
     }
 
@@ -115,45 +116,24 @@ int main()
             ALERT("Could not create config file");
             return 1;
         }
-        sprintf(info_buf, "butt created a default config file:\n(%s)\n",
+        sprintf(info_buf, "Opus Transmitter created a default config file:\n(%s)\n",
                 cfg_path );
 
         print_info(info_buf, 0);
         cfg_set_values();
     }
 
-#ifdef HAVE_LIBLAME
-    lame_stream.channel = cfg.audio.channel;
-    lame_stream.bitrate = cfg.audio.bitrate;
-    lame_stream.samplerate_in = cfg.audio.samplerate;
-    lame_stream.samplerate_out = cfg.audio.samplerate;
-    lame_enc_init(&lame_stream);
 
-    lame_rec.channel = cfg.rec.channel;
-    lame_rec.bitrate = cfg.rec.bitrate;
-    lame_rec.samplerate_in = cfg.audio.samplerate;
-    lame_rec.samplerate_out = cfg.rec.samplerate;
-    lame_enc_init(&lame_rec);
-#endif
-#ifdef HAVE_LIBVORBIS
-    vorbis_stream.channel = cfg.audio.channel;
-    vorbis_stream.bitrate = cfg.audio.bitrate;
-    vorbis_stream.samplerate = cfg.audio.samplerate;
-    vorbis_enc_init(&vorbis_stream);
-
-    vorbis_rec.channel = cfg.rec.channel;
-    vorbis_rec.bitrate = cfg.rec.bitrate;
-    vorbis_rec.samplerate = cfg.rec.samplerate;
-    vorbis_enc_init(&vorbis_rec);
-#endif
-#ifdef HAVE_LIBOPUS
     opus_stream.channel = cfg.audio.channel;
     opus_stream.bitrate = cfg.audio.bitrate;
     opus_stream.samplerate = cfg.audio.samplerate;
     opus_enc_init(&opus_stream);
 
-    // add recording later
-#endif
+    opus_rec.channel = cfg.audio.channel;
+    opus_rec.bitrate = cfg.audio.bitrate;
+    opus_rec.samplerate = cfg.audio.samplerate;
+    opus_enc_init(&opus_rec);
+
 
     print_info("=========================\n", 0);
 

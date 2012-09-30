@@ -42,5 +42,6 @@ extern lame_enc lame_rec;
 extern vorbis_enc vorbis_stream;
 extern vorbis_enc vorbis_rec;
 extern opus_enc opus_stream;
+extern opus_enc opus_rec;
 
 #endif

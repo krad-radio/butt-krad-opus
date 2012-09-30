@@ -301,16 +301,10 @@ do
     --prefix <prefix>       where to install
     --debug                 enable debug symbols
 
-    --with(out)-mp3         build with mp3 support (default=yes)
-    --with(out)-ogg         build with ogg support (default=yes)
-    --with(out)-opus        build with opus support (default=yes)
 
     --pa-header <dir>       directory of portaudio v19 header
     --pa-lib <dir>          directory of portaudio v19 library
-    --lame-header <dir>     directory of lame include folder
-    --lame-lib <dir>        directory of libmp3lame
-    --vorbis-header <dir>   directory of vorbis include folder
-    --vorbis-lib <dir>      directory of vorbis library
+
 
     --help                  shows usage of the configure script
 
@@ -320,11 +314,11 @@ EOF
 
     --with-fltk) CHECK_FLTK=1;;
     --with-qt) CHECK_QT=1 CHECK_FLTK=0;;
-    --with-ogg) CHECK_LIBVORBIS=1;;
+    --with-ogg) CHECK_LIBVORBIS=0;;
     --without-ogg) CHECK_LIBVORBIS=0;;
     --with-opus)  CHECK_LIBOPUS=1;;
     --without-opus)  CHECK_LIBOPUS=0;;
-    --with-mp3) CHECK_LIBLAME=1;;
+    --with-mp3) CHECK_LIBLAME=0;;
     --without-mp3) CHECK_LIBLAME=0;;
     --static) STATIC=1;;
 
@@ -437,8 +431,8 @@ exec 4> config.mk
 
 echo "# butts's config.mk" >&4
 echo "#_______________________" >&4
-echo "DIST_VER=butt-0.1.12" >&4
-echo "VERSION=\\\"butt-0.1.12\\\"" >&4
+echo "DIST_VER=Opus-Transmitter" >&4
+echo "VERSION=\\\"Opus-Transmitter\\\"" >&4
 echo "prefix=$prefix" >&4
 echo "CXX=${CXX}" >&4
 echo "CXXFLAGS=${CXXFLAGS}" >&4
@@ -467,12 +461,10 @@ check_portaudio
 
 [ "$CHECK_FLTK" -eq 1 ] && check_fltk
 [ "$CHECK_QT" -eq 1 ] && check_qt
-[ "$CHECK_LIBVORBIS" -eq 1 ] && check_libvorbis
-[ "$CHECK_LIBLAME" -eq 1 ] && check_libmp3lame
 [ "$CHECK_LIBOPUS" -eq 1 ] && check_libopus
 
-[ "$STATIC" -eq 1 ] && echo "LDFLAGS += -lasound -lpthread -L.. ../libstdc++.a /usr/lib/libshout.a /usr/lib/libvorbisenc.a /usr/lib/libvorbis.a /usr/lib/libogg.a /usr/lib/libmp3lame.a /usr/lib/libportaudio.a /usr/lib/libjack.a /usr/lib/librt.a" >&4
-[ "$STATIC" -eq 0 ] && echo "LDFLAGS += -lmp3lame" >&4
+[ "$STATIC" -eq 1 ] && echo "LDFLAGS += -lasound -lpthread -L.. ../libstdc++.a /usr/lib/libshout.a /usr/lib/libogg.a /usr/lib/libportaudio.a /usr/lib/libjack.a /usr/lib/librt.a" >&4
+[ "$STATIC" -eq 0 ] && echo "LDFLAGS += " >&4
 
 
 echo ""
@@ -480,19 +472,6 @@ echo "configure summary"
 echo ""
 #echo "GUI:              $GUI"
 
-if [ "$OGG" -eq 1 ]
-then
-    echo "ogg support:      YES"
-else
-    echo "ogg support:      NO"
-fi
-
-if [ "$MP3" -eq 1 ]
-then
-    echo "mp3 support:      YES"
-else
-    echo "mp3 support:      NO"
-fi
 
 if [ "$OPUS" -eq 1 ]
 then

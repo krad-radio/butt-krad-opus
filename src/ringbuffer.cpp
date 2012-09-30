@@ -113,6 +113,43 @@ unsigned int rb_read(struct ringbuf *rb, char *dest)
 	return len;
 }
 
+unsigned int rb_read_len(struct ringbuf *rb, char *dest, unsigned int len)
+{
+
+	char *end_ptr;
+
+
+	if(!dest || !rb->buf)
+		return 0;
+	if(len > rb->size)
+		return 0;
+
+    pthread_mutex_lock(&rb_mutex);
+
+	end_ptr = rb->buf + rb->size;
+	//len = rb_filled(rb);
+
+	if(rb->r_ptr + len < end_ptr ) {
+		memcpy(dest, rb->r_ptr, len);
+		rb->r_ptr += len;
+	}
+	/*buf content crosses the start point of the ring*/
+	else { 
+		/*copy from r_ptr to start of ringbuffer*/
+		memcpy(dest, rb->r_ptr, end_ptr - rb->r_ptr);
+		/*copy from start of ringbuffer to w_ptr*/
+		memcpy(dest + (end_ptr - rb->r_ptr), rb->buf, len - (end_ptr - rb->r_ptr));
+		rb->r_ptr = rb->buf + (len - (end_ptr - rb->r_ptr));
+	}
+
+    pthread_mutex_unlock(&rb_mutex);
+
+    if(rb->w_ptr == rb->r_ptr)
+        rb->full = 0;
+
+	return len;
+}
+
 int rb_write(struct ringbuf *rb, char* src, unsigned int len)
 {
 	char *end_ptr;

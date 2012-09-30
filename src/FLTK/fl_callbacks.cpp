@@ -152,12 +152,12 @@ void button_connect_cb()
     {
 
 
-#if HAVE_LIBVORBIS
+
         //we have to make sure that the first audio data
         //the server sees are the ogg headers
-        if(!strcmp(cfg.audio.codec, "ogg"))
-            vorbis_enc_write_header(&vorbis_stream);
-#endif
+        if(!strcmp(cfg.audio.codec, "opus"))
+            opus_enc_write_header(&opus_stream);
+
 
         print_info("connection established", 0);
         snprintf(text_buf, sizeof(text_buf),
@@ -1007,40 +1007,24 @@ void choice_cfg_bitrate_cb()
     sel_br = fl_g->choice_cfg_bitrate->value();
     cfg.audio.bitrate = br_list[sel_br];
     lame_stream.bitrate = br_list[sel_br];
-    vorbis_stream.bitrate = br_list[sel_br];
+    opus_stream.bitrate = br_list[sel_br];
 
-#if HAVE_LIBLAME
-    if(fl_g->radio_cfg_codec_mp3->value())
-    {
-        rc = lame_enc_reinit(&lame_stream);
-        if(rc != 0)
-        {
-            print_info("The Sample-/Bitrate combination is invalid", 1);
-            fl_g->choice_cfg_bitrate->value(old_br);
-            fl_g->choice_cfg_bitrate->redraw();
-            cfg.audio.bitrate = br_list[old_br];
-            lame_stream.bitrate = br_list[old_br];
-            lame_enc_reinit(&lame_stream);
-            return;
-        }
-    }
-#endif
-#if HAVE_LIBVORBIS
+
     if(fl_g->radio_cfg_codec_ogg->value())
     {
-        rc = vorbis_enc_reinit(&vorbis_stream);
+        rc = opus_enc_reinit(&opus_stream);
         if(rc != 0)
         {
             print_info("The Sample-/Bitrate combination is invalid", 1);
             cfg.audio.bitrate = br_list[old_br];
-            vorbis_stream.bitrate = br_list[old_br];
+            opus_stream.bitrate = br_list[old_br];
             fl_g->choice_cfg_bitrate->value(old_br);
             fl_g->choice_cfg_bitrate->redraw();
-            vorbis_enc_reinit(&vorbis_stream);
+            opus_enc_reinit(&opus_stream);
             return;
         }
     }
-#endif
+
 
     snprintf(text_buf, sizeof(text_buf), "Set stream bitrate to: %dk", cfg.audio.bitrate);
     print_info(text_buf, 0);
@@ -1066,40 +1050,25 @@ void choice_rec_bitrate_cb()
     sel_br = fl_g->choice_rec_bitrate->value();
     cfg.rec.bitrate = br_list[sel_br];
     lame_rec.bitrate = br_list[sel_br];
-    vorbis_rec.bitrate = br_list[sel_br];
+    opus_rec.bitrate = br_list[sel_br];
 
-#if HAVE_LIBLAME
-    if(fl_g->radio_cfg_codec_mp3->value())
-    {
-        rc = lame_enc_reinit(&lame_stream);
-        if(rc != 0)
-        {
-            print_info("The Sample-/Bitrate combination is invalid", 1);
-            fl_g->choice_rec_bitrate->value(old_br);
-            fl_g->choice_rec_bitrate->redraw();
-            cfg.rec.bitrate = br_list[old_br];
-            lame_rec.bitrate = br_list[old_br];
-            lame_enc_reinit(&lame_rec);
-            return;
-        }
-    }
-#endif
-#if HAVE_LIBVORBIS
+
+
     if(fl_g->radio_cfg_codec_ogg->value())
     {
-        rc = vorbis_enc_reinit(&vorbis_rec);
+        rc = opus_enc_reinit(&opus_rec);
         if(rc != 0)
         {
             print_info("The Sample-/Bitrate combination is invalid", 1);
             cfg.rec.bitrate = br_list[old_br];
-            vorbis_rec.bitrate = br_list[old_br];
+            opus_rec.bitrate = br_list[old_br];
             fl_g->choice_rec_bitrate->value(old_br);
             fl_g->choice_rec_bitrate->redraw();
-            vorbis_enc_reinit(&vorbis_rec);
+            opus_enc_reinit(&opus_rec);
             return;
         }
     }
-#endif
+
 
     snprintf(text_buf, sizeof(text_buf), "Set record bitrate to: %dk", cfg.rec.bitrate);
     print_info(text_buf, 0);
@@ -1127,41 +1096,25 @@ void choice_cfg_samplerate_cb()
     cfg.audio.samplerate = sr_list[sel_sr];
     lame_stream.samplerate_in = sr_list[sel_sr];
     lame_stream.samplerate_out = sr_list[sel_sr];
-    vorbis_stream.samplerate = sr_list[sel_sr]; 
+    opus_stream.samplerate = sr_list[sel_sr]; 
 
-#if HAVE_LIBLAME    
-    if(fl_g->radio_cfg_codec_mp3->value())
-    {
-        rc = lame_enc_reinit(&lame_stream);
-        if(rc != 0)
-        {
-            print_info("The Sample-/Bitrate combination is invalid", 1);
-            fl_g->choice_cfg_samplerate->value(old_sr);
-            fl_g->choice_cfg_samplerate->redraw();
-            cfg.audio.samplerate = sr_list[old_sr];
-            lame_stream.samplerate_in = sr_list[old_sr];
-            lame_stream.samplerate_out = sr_list[old_sr];
-            lame_enc_reinit(&lame_stream);
-            return;
-        }
-    }
-#endif
-#if HAVE_LIBVORBIS
+
+
     if(fl_g->radio_cfg_codec_ogg->value())
     {
-        rc = vorbis_enc_reinit(&vorbis_stream);
+        rc = opus_enc_reinit(&opus_stream);
         if(rc != 0)
         {
             print_info("The Sample-/Bitrate combination is invalid", 1);
             cfg.audio.samplerate = sr_list[old_sr];
-            vorbis_stream.samplerate = sr_list[old_sr]; 
+            opus_stream.samplerate = sr_list[old_sr]; 
             fl_g->choice_cfg_samplerate->value(old_sr);
             fl_g->choice_cfg_samplerate->redraw();
-            vorbis_enc_reinit(&vorbis_stream);
+            opus_enc_reinit(&opus_stream);
             return;
         }
     }
-#endif
+
 
     //reinit portaudio
     snd_reinit();
@@ -1194,7 +1147,7 @@ void choice_rec_samplerate_cb()
 
     cfg.rec.samplerate = sr_list[sel_sr];
     lame_rec.samplerate_out = sr_list[sel_sr];
-    vorbis_rec.samplerate = sr_list[sel_sr];
+    opus_rec.samplerate = sr_list[sel_sr];
 
     //if wav is selected as record output
     //then the audio/record samplerate are always the same
@@ -1203,38 +1156,22 @@ void choice_rec_samplerate_cb()
         fl_g->choice_cfg_samplerate->value(sel_sr);
         choice_cfg_samplerate_cb();
     }
-#if HAVE_LIBLAME
-    if(fl_g->radio_rec_codec_mp3->value())
-    {
-        rc = lame_enc_reinit(&lame_rec);
-        if(rc != 0)
-        {
-            print_info("The Sample-/Bitrate combination is invalid", 1);
-            fl_g->choice_rec_samplerate->value(old_sr);
-            fl_g->choice_rec_samplerate->redraw();
-            cfg.rec.samplerate = sr_list[old_sr];
-            lame_rec.samplerate_out = sr_list[old_sr];
-            lame_enc_reinit(&lame_rec);
-            return;
-        }
-    }
-#endif
-#if HAVE_LIBVORBIS
+
     if(fl_g->radio_rec_codec_ogg->value())
     {
-        rc = vorbis_enc_reinit(&vorbis_rec);
+        rc = opus_enc_reinit(&opus_rec);
         if(rc != 0)
         {
             print_info("The Sample-/Bitrate combination is invalid", 1);
             fl_g->choice_rec_samplerate->value(old_sr);
             fl_g->choice_rec_samplerate->redraw();
             cfg.rec.samplerate = sr_list[old_sr];
-            vorbis_rec.samplerate = sr_list[old_sr];
-            vorbis_enc_reinit(&vorbis_rec);
+            opus_rec.samplerate = sr_list[old_sr];
+            opus_enc_reinit(&opus_rec);
             return;
         }
     }
-#endif
+
     snprintf(text_buf, sizeof(text_buf), "Set record samplerate to: %dHz", cfg.rec.samplerate);
     print_info(text_buf, 0);
 
@@ -1247,16 +1184,12 @@ void radio_cfg_channel_stereo_cb()
 
     cfg.audio.channel = 2;
     lame_stream.channel = 2;
-    vorbis_stream.channel = 2;
+    opus_stream.channel = 2;
 
-#if HAVE_LIBLAME
-    if(fl_g->radio_cfg_codec_mp3->value())
-        lame_enc_reinit(&lame_stream);
-#endif
-#if HAVE_LIBVORBIS
+
     if(fl_g->radio_cfg_codec_ogg->value())
-        vorbis_enc_reinit(&vorbis_stream);
-#endif
+        opus_enc_reinit(&opus_stream);
+
 
     snd_reinit();
     
@@ -1274,7 +1207,7 @@ void radio_rec_channel_stereo_cb()
 {
     cfg.rec.channel = 2;
     lame_rec.channel = 2;
-    vorbis_rec.channel = 2;
+    opus_rec.channel = 2;
     
     //if wav is selected as record output
     //then the audio/record channel are always the same
@@ -1284,14 +1217,10 @@ void radio_rec_channel_stereo_cb()
         radio_cfg_channel_stereo_cb();
     }
 
-#if HAVE_LIBLAME
-    if(fl_g->radio_rec_codec_mp3->value())
-        lame_enc_reinit(&lame_rec);
-#endif
-#if HAVE_LIBVORBIS
+
     if(fl_g->radio_rec_codec_ogg->value())
-        vorbis_enc_reinit(&vorbis_rec);
-#endif
+        opus_enc_reinit(&opus_rec);
+
     print_info("Set record channels to: stereo", 0);
 
     unsaved_changes = 1;
@@ -1301,16 +1230,12 @@ void radio_cfg_channel_mono_cb()
 {
     cfg.audio.channel = 1;
     lame_stream.channel = 1;
-    vorbis_stream.channel = 1;
+    opus_stream.channel = 1;
 
-#if HAVE_LIBLAME
-    if(fl_g->radio_cfg_codec_mp3->value())
-        lame_enc_reinit(&lame_stream);
-#endif
-#if HAVE_LIBVORBIS
+
     if(fl_g->radio_cfg_codec_ogg->value())
-        vorbis_enc_reinit(&vorbis_stream);
-#endif
+        opus_enc_reinit(&opus_stream);
+
     
     //if wav is selected as record output
     //then the audio/record channel are always the same
@@ -1328,7 +1253,7 @@ void radio_rec_channel_mono_cb()
 {
     cfg.rec.channel = 1;
     lame_rec.channel = 1;
-    vorbis_rec.channel = 1;
+    opus_rec.channel = 1;
     
     //if wav is selected as record output
     //then the audio/record channel are always the same
@@ -1338,14 +1263,10 @@ void radio_rec_channel_mono_cb()
         radio_cfg_channel_mono_cb();
     }
 
-#if HAVE_LIBLAME
-    if(fl_g->radio_rec_codec_mp3->value())
-        lame_enc_reinit(&lame_rec);
-#endif
-#if HAVE_LIBVORBIS
+
     if(fl_g->radio_rec_codec_ogg->value())
-        vorbis_enc_reinit(&vorbis_rec);
-#endif
+        opus_enc_reinit(&opus_rec);
+
 
     print_info("Set record channels to: mono", 0);
 
@@ -1514,26 +1435,26 @@ void radio_cfg_codec_mp3_cb()
 
 void radio_cfg_codec_ogg_cb()
 {
-#ifdef HAVE_LIBVORBIS
-    if(vorbis_enc_reinit(&vorbis_stream) != 0)
+
+    if(opus_enc_reinit(&opus_stream) != 0)
     {
-        print_info("Vorbis doesn't support current"
+        print_info("opus doesn't support current"
                    "Sample-/Bitrate combination", 1);
 
         fl_g->radio_cfg_codec_mp3->setonly();
         return;
     }
-    strcpy(cfg.audio.codec, "ogg");
-    print_info("Set stream format to: ogg", 0);
+    strcpy(cfg.audio.codec, "opus");
+    print_info("Set stream format to: opus", 0);
     unsaved_changes = 1;
-#endif
+
 }
 
 void radio_cfg_codec_opus_cb()
 {
-#ifdef HAVE_LIBOPUS
-    print_info("Setup opus!", 0);
-#endif
+
+  //  print_info("Setup opus!", 0);
+
 }
 
 void radio_rec_codec_mp3_cb()

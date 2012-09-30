@@ -22,9 +22,9 @@
 #include "config.h"
 
 #ifdef _WIN32
- const char CONFIG_FILE[] = "buttrc";
+ const char CONFIG_FILE[] = "opusass";
 #else
- const char CONFIG_FILE[] = ".buttrc";
+ const char CONFIG_FILE[] = ".opusass";
 #endif
 
 config_t cfg;
@@ -234,7 +234,7 @@ int cfg_set_values()
     cfg.audio.pcm_list   = snd_get_devices(&cfg.audio.dev_count);
 
     if(cfg.audio.samplerate == -1)
-        cfg.audio.samplerate = 44100;
+        cfg.audio.samplerate = 48000;
 
     if(cfg.audio.bitrate == -1)
         cfg.audio.bitrate = 128;
@@ -244,19 +244,13 @@ int cfg_set_values()
 
     if(cfg.audio.codec == NULL)
     {
-        cfg.audio.codec = (char*)malloc(4*sizeof(char));
-#ifdef HAVE_LIBLAME
-        strcpy(cfg.audio.codec, "mp3");
-#elif HAVE_LIBVORBIS
-        strcpy(cfg.audio.codec, "ogg");
-#elif HAVE_LIBOPUS
-	strcpy(cfg.audio.codec, "opus");
-#else
-        //error: but was compiled without ogg and mp3 support
-        strcpy(cfg.audio.codec, "err");
-#endif
-    }
+        cfg.audio.codec = (char*)malloc(8*sizeof(char));
 
+
+		strcpy(cfg.audio.codec, "opus");
+
+    }
+    
     //for config backward compability
     if(cfg.audio.dev_num >= cfg.audio.dev_count)
         cfg.audio.dev_num = 0;
@@ -276,38 +270,30 @@ int cfg_set_values()
         cfg.rec.channel = 2;
 
     if(cfg.rec.samplerate == -1)
-        cfg.rec.samplerate = 44100;
+        cfg.rec.samplerate = 48000;
 
     if(cfg.rec.start_rec == -1)
         cfg.rec.start_rec = 1;
 
     if(cfg.rec.codec == NULL)
     {
-        cfg.rec.codec = (char*)malloc(4*sizeof(char));
-#ifdef HAVE_LIBLAME
-        strcpy(cfg.rec.codec, "mp3");
-#elif HAVE_LIBVORBIS
-        strcpy(cfg.rec.codec, "ogg");
-#else
-        strcpy(cfg.rec.codec, "wav");
-#endif
+        cfg.rec.codec = (char*)malloc(8*sizeof(char));
+
+        strcpy(cfg.rec.codec, "opus");        
+
     }
 
     if(cfg.rec.filename == NULL)
     {
-        cfg.rec.filename = (char*)malloc(strlen("rec_(%m_%d_%y)_%i.ext")+1);
-#ifdef HAVE_LIBLAME
-        strcpy(cfg.rec.filename, "rec_(%m_%d_%y)_%i.mp3");
-#elif HAVE_LIB_VORBIS
-        strcpy(cfg.rec.filename, "rec_(%m_%d_%y)_%i.ogg");
-#else
-        strcpy(cfg.rec.filename, "rec_(%m_%d_%y)_%i.wav");
-#endif
+        cfg.rec.filename = (char*)malloc(strlen("rec_(%m_%d_%y)_%i.exxt")+1);
+
+        strcpy(cfg.rec.filename, "rec_(%m_%d_%y)_%i.opus");
+
     }
 
     if(cfg.rec.folder == NULL)
     {
-        cfg.rec.folder = (char*)malloc(3*sizeof(char));
+        cfg.rec.folder = (char*)malloc(6*sizeof(char));
         strcpy(cfg.rec.folder, "./");
     }
 
@@ -420,23 +406,15 @@ int cfg_set_values()
 
 int cfg_create_default()
 {
-    char ext[4];
-    char codec[4];
+    char ext[8];
+    char codec[8];
     FILE *cfg_fd;
     cfg_fd = fopen(cfg_path, "wb+");
     if(cfg_fd == NULL)
         return 1;
 
-#if HAVE_LIBLAME
-    strcpy(ext, "mp3");
-    strcpy(codec, "mp3");
-#elif HAVE_LIBVORBIS
-    strcpy(ext, "ogg");
-    strcpy(codec, "ogg");
-#else
-    strcpy(ext, "wav");
-    strcpy(codec, "");
-#endif
+    strcpy(ext, "opus");
+    strcpy(codec, "opus");
 
 
     fprintf(cfg_fd, "This is a configuration file for butt (broadcast using this tool)\n\n");
@@ -455,7 +433,7 @@ int cfg_create_default()
     fprintf(cfg_fd,
             "[audio]\n"
             "device = default\n"
-            "samplerate = 44100\n"
+            "samplerate = 48000\n"
             "bitrate = 128\n"
             "channel = 2\n"
             "codec = %s\n\n",
@@ -464,7 +442,7 @@ int cfg_create_default()
 
     fprintf(cfg_fd,
             "[record]\n"
-            "samplerate = 44100\n"
+            "samplerate = 48000\n"
             "bitrate = 192\n"
             "channel = 2\n"
             "codec = %s\n"

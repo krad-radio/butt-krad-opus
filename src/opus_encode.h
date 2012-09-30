@@ -20,17 +20,43 @@
 #include <opus/opus_multistream.h>
 #include <ogg/ogg.h>
 
+#define APPVERSION "Krackhead"
+#define DEFAULT_OPUS_BITRATE 128000
+
+typedef struct {
+   int version;
+   int channels; /* Number of channels: 1..255 */
+   int preskip;
+   ogg_uint32_t input_sample_rate;
+   int gain; /* in dB S7.8 should be zero whenever possible */
+   int channel_mapping;
+   /* The rest is only used if channel_mapping != 0 */
+   int nb_streams;
+   int nb_coupled;
+   unsigned char stream_map[255];
+} OpusHeader;
 
 struct opus_enc {
-    ogg_stream_state os; /* take physical pages, weld into a logical stream of packets */
-    ogg_page         og; /* one Ogg bitstream page.  opus packets are inside */
-    ogg_packet       op; /* one raw packet of data for decode */
-    OpusMSEncoder    *encoder;
-
+    ogg_stream_state os;
+    ogg_page         og;
+    ogg_packet       op;
+    OpusEncoder    *encoder;
+	OpusHeader *header;
+	unsigned char *header_data;
+	unsigned char *tags;
+	int tags_size;
+	int header_size;
+	
+	int packetno;
+	int granulepos;
+	
     int bitrate;
     int samplerate;
     int channel;
     int state;
+    
+	unsigned char *buffer;
+    
 };
 
 enum {
@@ -41,7 +67,7 @@ enum {
 //extern opus_info  opus_vi;
 extern OpusEncoder opus_vi;
 extern char* opus_buf;
-
+int opus_header_to_packet(const OpusHeader *h, unsigned char *packet, int len);
 int opus_enc_init(opus_enc *opus);
 int opus_enc_encode(opus_enc *opus, short *pcm_buf, char *enc_buf, int size);
 

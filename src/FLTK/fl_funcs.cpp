@@ -42,22 +42,12 @@ void fill_cfg_widgets()
     int bitrate[] = { 32, 40, 48, 56, 64, 80, 96, 112,
                       128, 160, 192, 224, 256, 320, 0 };
 
-#ifndef HAVE_LIBVORBIS
+
     fl_g->radio_cfg_codec_ogg->deactivate();
     fl_g->radio_rec_codec_ogg->deactivate();
-#endif
-#ifndef HAVE_LIBLAME
+
     fl_g->radio_cfg_codec_mp3->deactivate();
     fl_g->radio_rec_codec_mp3->deactivate();
-    #ifndef HAVE_LIBVORBIS
-     #define NO_CODEC
-    #endif
-#endif //Any idea how to make this prettier?
-#ifdef NO_CODEC
-    fl_g->button_connect->deactivate();
-    print_info("error: butt was compiled without mp3 and ogg\n"
-            "support.\nYou won't be able to connect to a server.", 1);
-#endif
 
     //fill the main section
     for(i = 0; i < cfg.audio.dev_count; i++)

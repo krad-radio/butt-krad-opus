@@ -2038,7 +2038,7 @@ flgui::flgui() {
     window_add_icy->end();
   } // Fl_Double_Window* window_add_icy
   Fl::scheme("plastic");
-window_main->label(VERSION);
+window_main->label("Opus Transmitter");
 
 info_buffer = new Fl_Text_Buffer();
 info_output->buffer(info_buffer);

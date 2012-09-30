@@ -69,7 +69,7 @@ int snd_init()
     if((p_err = Pa_Initialize()) != paNoError)
     {
         snprintf(info_buf, sizeof(info_buf),
-				"PortAudio init failed:\n%s\n",
+				"Sound init failed:\n%s\n",
 				Pa_GetErrorText(p_err));
 
         ALERT(info_buf);
@@ -104,7 +104,7 @@ int snd_open_stream()
         return 1;
     }
 
-    buf_size = PA_FRAMES * 2;
+    buf_size = PA_FRAMES * 4;
     framepacket_size = PA_FRAMES * cfg.audio.channel;
 
     pa_pcm_buf = (short*)malloc(buf_size * sizeof(short));
@@ -209,6 +209,9 @@ void *snd_stream_thread(void *data)
     int sent;
     int rb_read_bytes;
 	int encode_bytes_read;
+	int bytes_to_read;
+
+	bytes_to_read = 960 * 2*cfg.audio.channel;
 
     char *enc_buf = (char*)malloc(stream_rb.size * sizeof(char)*10);
     char *audio_buf = (char*)malloc(stream_rb.size * sizeof(short));
@@ -228,25 +231,29 @@ void *snd_stream_thread(void *data)
         if(!connected)
             break;
 
-		rb_read_bytes = rb_read(&stream_rb, audio_buf);
-		if(rb_read_bytes == 0)
-			continue;
+		while ((rb_filled(&stream_rb)) >= bytes_to_read) {
 
-#if HAVE_LIBLAME
-        if(!strcmp(cfg.audio.codec, "mp3"))
-            encode_bytes_read = lame_enc_encode(&lame_stream, (short int*)audio_buf, enc_buf,
-                                rb_read_bytes/(2*cfg.audio.channel), stream_rb.size*10);
-#endif
-#if HAVE_LIBVORBIS
-        if(!strcmp(cfg.audio.codec, "ogg"))
-            encode_bytes_read = vorbis_enc_encode(&vorbis_stream, (short int*)audio_buf, 
-                    enc_buf, rb_read_bytes/(2*cfg.audio.channel));
-#endif
-        if((sent = xc_send(enc_buf, encode_bytes_read)) == -1)
-            connected = 0; 
-        else
-            bytes_sent += encode_bytes_read;
+	
+			rb_read_len(&stream_rb, audio_buf, bytes_to_read);
+
+
+
+
+
+		    if(!strcmp(cfg.audio.codec, "opus"))
+		        encode_bytes_read = opus_enc_encode(&opus_stream, (short int*)audio_buf, 
+		                enc_buf, bytes_to_read/(2*cfg.audio.channel));
+
+		    if((sent = xc_send(enc_buf, encode_bytes_read)) == -1)
+		        connected = 0; //disconnected
+		    else
+		        bytes_sent += encode_bytes_read;
+		        
+		        
+		}
     }
+    
+
 
     free(enc_buf);
     free(audio_buf);
@@ -302,38 +309,19 @@ void* snd_rec_thread(void *data)
 		if(rb_read_bytes == 0)
 			continue;
 
-#if HAVE_LIBLAME
-        if(!strcmp(cfg.rec.codec, "mp3"))
-        {
-
-            enc_bytes_read = lame_enc_encode(&lame_rec, (short int*)audio_buf, enc_buf,
-                                rb_read_bytes/(2*cfg.rec.channel), rec_rb.size*10);
-            bytes_written += fwrite(enc_buf, 1, enc_bytes_read, cfg.rec.fd);
-        }
-#endif
-#if HAVE_LIBVORBIS
-        if (!strcmp(cfg.rec.codec, "ogg"))
+        if (!strcmp(cfg.rec.codec, "opus"))
         {
             if(!ogg_header_written)
             {
-                vorbis_enc_write_header(&vorbis_rec);
+                opus_enc_write_header(&opus_rec);
                 ogg_header_written = 1;
             }
 
-            enc_bytes_read = vorbis_enc_encode(&vorbis_rec, (short int*)audio_buf, 
+            enc_bytes_read = opus_enc_encode(&opus_rec, (short int*)audio_buf, 
                     enc_buf, rb_read_bytes/(2*cfg.rec.channel));
             bytes_written += fwrite(enc_buf, 1, enc_bytes_read, cfg.rec.fd);
         }
-#endif
-        if (!strcmp(cfg.rec.codec, "wav"))
-        {
-            //this permanently updates the filesize value in the WAV header
-            //so we still have a valid WAV file in case of a crash
-            wav_write_header(cfg.rec.fd, cfg.audio.channel,
-                    cfg.audio.samplerate, /*bps*/ 16);
-            
-            bytes_written += fwrite(audio_buf, sizeof(char), rb_read_bytes, cfg.rec.fd); 
-        }
+
     }
 
     fclose(cfg.rec.fd);
