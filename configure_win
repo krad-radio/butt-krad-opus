@@ -4,24 +4,25 @@
 [ -z $CXXFLAGS ] && CXXFLAGS=
 [ -z $LDFLAGS ] && LDFLAGS=
 
-LIBS="-lpthreadGC2"
+LIBS="-lpthread"
 STATIC=0
 CHECK_FLTK=1
 CHECK_QT=0
 CHECK_LIBLAME=1
 CHECK_LIBVORBIS=1
+CHECK_LIBOPUS=1
 OGG=0
 MP3=0
 prefix=/usr/local
 
-header_flags=-I/usr/local/include
-lib_flags=-L/usr/local/lib
-pa_header=$header_flags
-pa_lib=$lib_flags
-vorbis_header=$header_flags
-vorbis_lib=$lib_flags
-lame_header=$header_flags
-lame_lib=$lib_flags
+#header_flags=-I/usr/local/include
+#lib_flags=-L/usr/local/lib
+#pa_header=$header_flags
+#pa_lib=$lib_flags
+#vorbis_header=$header_flags
+#vorbis_lib=$lib_flags
+#lame_header=$header_flags
+#lame_lib=$lib_flags
 
 ##############################################################
 
@@ -257,6 +258,41 @@ EOF
             echo "WITH_LIBVORBIS:=0" >&4
         fi
 }
+check_libopus() {
+
+	cat << EOF >tmp.c
+#include <opus/opus.h>
+int main() {
+opus_get_version_string();
+return 0;
+}
+EOF
+	msg_chkfor "compile with libopus"
+	if ${CXX} -c tmp.c -o tmp 2>&3
+	then
+		echo "OK"
+		msg_chkfor "link with libopus"
+		if ${CXX} tmp.c -o tmp -lopus 2>&3
+		then
+			echo "OK"
+			echo "#_______________________" >&4
+				echo "WITH_LIBOPUS:=1" >&4
+				echo "CXXFLAGS_LIBOPUS:=" >&4
+				echo "CXXFLAGS+=$opus_header" >&4
+				echo "LDFLAGS+=$opus_lib" >&4
+				[ "$STATIC" -eq 0 ] && echo "LIBS_LIBOPUS:=-logg -lopus -lws2_32" >&4
+				echo "SRC_LIBOPUS:=opus_encode.cpp" >&4
+				echo "" >&4
+				OPUS=1
+			else
+				echo "FAILED"
+				echo "WITH_LIBOPUS:=0" >&4
+			fi
+		else
+			echo "FAILED"
+			echo "WITH_LIBOPUS:=0" >&4
+		fi
+}
 
 
 #############################################################################
@@ -274,15 +310,10 @@ do
     --prefix <prefix>       where to install
     --debug                 enable debug symbols
 
-    --with(out)-mp3         build with mp3 support (default=yes)
-    --with(out)-ogg         build with ogg support (default=yes)
 
     --pa-header <dir>       directory of portaudio v19 header
     --pa-lib <dir>          directory of portaudio v19 library
-    --lame-header <dir>     directory of lame include folder
-    --lame-lib <dir>        directory of libmp3lame 
-    --vorbis-header <dir>   directory of vorbis include folder
-    --vorbis-lib <dir>      directory of vorbis library
+
 
     --help                  shows usage of the configure script
 
@@ -292,9 +323,11 @@ EOF
 
     --with-fltk) CHECK_FLTK=1;;
     --with-qt) CHECK_QT=1 CHECK_FLTK=0;;
-    --with-ogg) CHECK_LIBVORBIS=1;;
+    --with-ogg) CHECK_LIBVORBIS=0;;
     --without-ogg) CHECK_LIBVORBIS=0;;
-    --with-mp3) CHECK_LIBLAME=1;;
+    --with-opus)  CHECK_LIBOPUS=1;;
+    --without-opus)  CHECK_LIBOPUS=0;;
+    --with-mp3) CHECK_LIBLAME=0;;
     --without-mp3) CHECK_LIBLAME=0;;
     --static) STATIC=1;;
 
@@ -375,6 +408,17 @@ EOF
         fi
         ;;
 
+    --opus-lib)
+        shift
+        if [ $# -gt 0 ]
+        then
+            opus_lib="-L$1"
+        else
+            echo "error, missing argument for --opus-lib."
+            exit 1
+        fi
+        ;;
+
     --debug)
         CXXFLAGS="${CXXFLAGS} -g"
         LDFLAGS="${LDFLAGS} -g"
@@ -396,8 +440,8 @@ exec 4> config.mk
 
 echo "# butts's config.mk" >&4
 echo "#_______________________" >&4
-echo "DIST_VER=butt-0.1.12" >&4
-echo "VERSION=\\\"butt-0.1.12\\\"" >&4
+echo "DIST_VER=Opus-Transmitter" >&4
+echo "VERSION=\\\"Opus-Transmitter\\\"" >&4
 echo "prefix=$prefix" >&4
 echo "CXX=${CXX}" >&4
 echo "CXXFLAGS=${CXXFLAGS}" >&4
@@ -426,11 +470,10 @@ check_portaudio
 
 [ "$CHECK_FLTK" -eq 1 ] && check_fltk
 [ "$CHECK_QT" -eq 1 ] && check_qt
-[ "$CHECK_LIBVORBIS" -eq 1 ] && check_libvorbis
-[ "$CHECK_LIBLAME" -eq 1 ] && check_libmp3lame
+[ "$CHECK_LIBOPUS" -eq 1 ] && check_libopus
 
 [ "$STATIC" -eq 1 ] && echo "LDFLAGS += -lasound -lpthread -L.. ../libstdc++.a /usr/local/lib/libshout.a /usr/lib/libvorbisenc.a /usr/lib/libvorbis.a /usr/lib/libogg.a /usr/lib/libmp3lame.a /usr/local/lib/libportaudio.a  /usr/lib/librt.a" >&4
-[ "$STATIC" -eq 0 ] && echo "LDFLAGS += -lmp3lame" >&4
+[ "$STATIC" -eq 0 ] && echo "LDFLAGS += " >&4
 
 
 echo ""
@@ -438,18 +481,12 @@ echo "configure summary"
 echo ""
 #echo "GUI:              $GUI"
 
-if [ "$OGG" -eq 1 ]
-then
-    echo "ogg support:      YES"
-else
-    echo "ogg support:      NO"
-fi
 
-if [ "$MP3" -eq 1 ]
+if [ "$OPUS" -eq 1 ]
 then
-    echo "mp3 support:      YES"
+	echo "opus support:      YES"
 else
-    echo "mp3 support:      NO"
+	echo "opus support:      NO"
 fi
 
 echo ""
