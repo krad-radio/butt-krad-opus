@@ -13,6 +13,7 @@ CHECK_FLTK=1
 CHECK_QT=0
 CHECK_LIBLAME=1
 CHECK_LIBVORBIS=1
+CHECK_LIBOPUS=1
 OGG=0
 prefix=/usr/local
 
@@ -261,6 +262,41 @@ EOF
         fi
 }
 
+check_libopus() {
+
+    cat << EOF > tmp.c
+#include <opus/opus.h>
+int main() {
+  opus_get_version_string();
+  return 0;
+}
+EOF
+    msg_chkfor "compile with libopus"
+    if ${CXX} -c tmp.c -o /dev/null 2>&3
+    then
+      echo "OK"
+      msg_chkfor "link with libopus"
+      if ${CXX} tmp.c -o /dev/null -lopus 2>&3
+      then
+        echo "OK"
+        echo "#_______________________" >&4
+        echo "WITH_LIBOPUS:=1" >&4
+        echo "CXXFLAGS_LIBOPUS:=" >&4
+        echo "CXXFLAGS+=$opus_header" >&4
+        echo "LDFLAGS+=$opus_lib" >&4
+        [ "$STATIC" -eq 0 ] && echo "LIBS_LIBOPUS:=-logg -lopus" >&4
+        echo "SRC_LIBOPUS:=opus_encode.cpp" >&4
+        echo "" >&4
+        OPUS=1
+      else
+        echo "FAILED"
+        echo "WITH_LIBOPUS:=0" >&4
+      fi
+    else
+        echo "FAILED"
+        echo "WITH_LIBOPUS:=0" >&4
+    fi
+}
 
 #############################################################################
 
@@ -297,6 +333,8 @@ EOF
     --with-qt) CHECK_QT=1 CHECK_FLTK=0;;
     --with-ogg) CHECK_LIBVORBIS=1;;
     --without-ogg) CHECK_LIBVORBIS=0;;
+    --with-opus) CHECK_LIBOPUS=1;;
+    --without-opus) CHECK_LIBOPUS=0;;
     --with-mp3) CHECK_LIBLAME=1;;
     --without-mp3) CHECK_LIBLAME=0;;
     --static) STATIC=1;;
@@ -378,6 +416,17 @@ EOF
         fi
         ;;
 
+    --opus-lib)
+        shift
+        if [ $# -gt 0 ]
+        then
+            opus_lib="-L$1"
+        else
+            echo "error, missing argument for --opus-lib."
+            exit 1;
+        fi
+        ;;
+
     --debug)
         CXXFLAGS="${CXXFLAGS} -g"
         LDFLAGS="${LDFLAGS} -g"
@@ -430,6 +479,7 @@ check_portaudio
 [ "$CHECK_FLTK" -eq 1 ] && check_fltk
 [ "$CHECK_QT" -eq 1 ] && check_qt
 [ "$CHECK_LIBVORBIS" -eq 1 ] && check_libvorbis
+[ "$CHECK_LIBOPUS" -eq 1 ] && check_libopus
 [ "$CHECK_LIBLAME" -eq 1 ] && check_libmp3lame
 [ "$STATIC" -eq 1 ] && echo "LDFLAGS += -lpthread /usr/local/universal/lib/libportaudio.a /usr/local/universal/lib/libshout.a /usr/local/universal/lib/libvorbisenc.a /usr/local/universal/lib/libvorbis.a /usr/local/universal/lib/libogg.a /usr/local/universal/lib/libtheora.a /usr/local/universal/lib/libspeex.a /usr/local/universal/lib/libmp3lame.a -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreServices" >&4
 [ "$STATIC" -eq 0 ] && echo "LDFLAGS += -lmp3lame" >&4
@@ -445,6 +495,13 @@ then
     echo "ogg support:      YES"
 else
     echo "ogg support:      NO"
+fi
+
+if [ "$OPUS" -eq 1 ]
+then
+    echo "opus support:     YES"
+else
+    echo "opus support:     NO"
 fi
 
 if [ "$MP3" -eq 1 ]
