@@ -1,10 +1,9 @@
 #!/bin/sh
 
 [ -z $CXX ] && CXX=g++
-[ -z $CXXFLAGS ] && CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc -mmacosx-version-min=10.3"
-[ -z $LDFLAGS ] && LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc -mmacosx-version-min=10.3"
+[ -z $ECHO ] && ECHO=/bin/echo
 
-MACOSX_DEPLOYMENT_TARGET=10.4
+MACOSX_DEPLOYMENT_TARGET=10.5
 export MACOSX_DEPLOYMENT_TARGET
 
 LIBS=""
