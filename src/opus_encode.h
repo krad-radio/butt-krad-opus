@@ -20,7 +20,7 @@
 #include <opus/opus_multistream.h>
 #include <ogg/ogg.h>
 
-#define APPVERSION "OpusTransmiter Special Edition"
+#define APPVERSION "OpusTransmitter Version 64G"
 #define DEFAULT_OPUS_BITRATE 128000
 
 typedef struct {
@@ -48,7 +48,7 @@ struct opus_enc {
 	int header_size;
 	
 	int packetno;
-	int granulepos;
+	ogg_int64_t granulepos;
 	
 	int last_bitrate;
     int bitrate;
